@@ -4,7 +4,8 @@ import RedirectIfAuthenticated from './auth/RedirectIfAuthenticated.jsx'
 import RequireAuth from './auth/RequireAuth.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
-import TransactionsPage from './pages/TransactionsPage.jsx'
+import EventDetailPage from './pages/EventDetailPage.jsx'
+import EventsPage from './pages/EventsPage.jsx'
 
 export default function App() {
   return (
@@ -17,7 +18,8 @@ export default function App() {
       {/* Tudo abaixo da guarda exige sessão: rota nova já nasce protegida. */}
       <Route element={<RequireAuth />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<TransactionsPage />} />
+          <Route path="/" element={<EventsPage />} />
+          <Route path="/eventos/:eventId" element={<EventDetailPage />} />
         </Route>
       </Route>
 

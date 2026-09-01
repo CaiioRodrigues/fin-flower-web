@@ -1,8 +1,8 @@
 # Fin Flower Web
 
-Front-end do Fin Flower em React + Vite. Consome a
-[API](https://github.com/CaiioRodrigues/fin-flower-api) para autenticação; a tela
-de lançamentos ainda usa `localStorage` e será migrada para os eventos da API.
+Front-end do Fin Flower em React + Vite. Controle financeiro **por evento**:
+cada evento soma suas entradas e saídas, e o caixa é a soma dos resultados.
+Consome inteiramente a [API](https://github.com/CaiioRodrigues/fin-flower-api).
 
 ## Funcionalidades
 
@@ -14,10 +14,21 @@ de lançamentos ainda usa `localStorage` e será migrada para os eventos da API.
 - Rotas protegidas — quem não tem sessão vai para o login e volta para a página pretendida
 - Logout revoga o refresh token no servidor
 
-**Lançamentos** (ainda em `localStorage`)
+**Eventos**
 
-- CRUD completo com validação, busca, filtro por tipo e resumo de saldo
-- Layout responsivo
+- Lista com entradas, saídas e resultado de cada evento, filtrável por período e situação
+- Criar, editar e excluir evento; fechar para consolidar e reabrir quando precisar
+- Evento fechado esconde o formulário e as ações de lançamento
+
+**Lançamentos**
+
+- Cadastro, edição e exclusão dentro do evento, com validação e categorias
+- Cada alteração relê o evento no servidor, para a tela mostrar o mesmo número que o caixa
+
+**Caixa consolidado**
+
+- Entradas, saídas e saldo do período, mais quantos eventos deram lucro, prejuízo ou fecharam no zero
+- Layout responsivo — a tabela vira cards no mobile
 
 ## Como rodar
 
@@ -59,13 +70,18 @@ src/
 ├── pages/
 │   ├── LoginPage.jsx
 │   ├── RegisterPage.jsx
-│   └── TransactionsPage.jsx
-├── components/                # AppLayout, AuthLayout, Filters, Summary, ...
-├── hooks/useTransactions.js
-├── services/storage.js
+│   ├── EventsPage.jsx         # caixa, filtros e lista de eventos
+│   └── EventDetailPage.jsx    # evento, seus lançamentos e ações
+├── components/                # AppLayout, CashSummary, EventList, EntryForm, ...
+├── hooks/useAsync.js          # carregamento, erro e recarga
 ├── styles/index.css
 └── utils/format.js
 ```
+
+`api/events.js` concentra as chamadas de evento, lançamento e caixa; nenhuma tela
+monta URL na mão. `useAsync` descarta a resposta de uma chamada antiga quando
+outra já começou — sem isso, trocar o filtro rápido deixaria a tela com o
+resultado errado.
 
 ## Como a sessão funciona
 
@@ -92,3 +108,8 @@ npm test
 `src/api/__tests__/client.test.js` cobre o cliente HTTP: envio do token, renovação
 após 401, repetição única, fila em voo do refresh, encerramento da sessão quando a
 renovação falha e a tradução dos erros por campo do `ProblemDetails`.
+
+Os fluxos de tela foram verificados no navegador contra um stub que implementa o
+mesmo contrato da API — autenticação, o cenário de cinco eventos com o caixa
+fechando em R$ 14.000, filtro por período, edição e exclusão de lançamento com
+recálculo do resultado, e o congelamento do evento fechado.
