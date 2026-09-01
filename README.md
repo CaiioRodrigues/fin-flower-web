@@ -1,25 +1,36 @@
 # Fin Flower Web
 
-CRUD simples de lançamentos financeiros feito em React + Vite. Os dados ficam
-salvos no `localStorage` do navegador — não há backend.
+Front-end do Fin Flower em React + Vite. Consome a
+[API](https://github.com/CaiioRodrigues/fin-flower-api) para autenticação; a tela
+de lançamentos ainda usa `localStorage` e será migrada para os eventos da API.
 
 ## Funcionalidades
 
-- **Create**: cadastro de lançamento (descrição, valor, data, tipo e categoria)
-- **Read**: listagem com busca por descrição/categoria e filtro por tipo
-- **Update**: edição de um lançamento existente no mesmo formulário
-- **Delete**: exclusão com confirmação
-- Resumo de receitas, despesas e saldo (calculado sobre o filtro atual)
-- Validação de formulário e layout responsivo
+**Autenticação**
+
+- Login e cadastro consumindo a API, com os erros por campo que ela devolve
+- Sessão restaurada ao recarregar a página
+- Renovação transparente do token: um 401 dispara o refresh e repete a chamada
+- Rotas protegidas — quem não tem sessão vai para o login e volta para a página pretendida
+- Logout revoga o refresh token no servidor
+
+**Lançamentos** (ainda em `localStorage`)
+
+- CRUD completo com validação, busca, filtro por tipo e resumo de saldo
+- Layout responsivo
 
 ## Como rodar
 
+Primeiro aponte para a API:
+
 ```bash
+cp .env.example .env.local   # ajuste VITE_API_URL
 npm install
 npm run dev
 ```
 
-A aplicação sobe em `http://localhost:5173`.
+A aplicação sobe em `http://localhost:5173`. A API precisa liberar essa origem no
+CORS — o `appsettings.Development.json` dela já vem com ela configurada.
 
 Outros comandos:
 
@@ -27,31 +38,57 @@ Outros comandos:
 npm run build    # build de produção em dist/
 npm run preview  # serve o build gerado
 npm run lint     # ESLint
+npm test         # Vitest
 ```
 
 ## Estrutura
 
 ```
 src/
-├── App.jsx                    # composição da tela e estado de filtros/edição
-├── main.jsx                   # bootstrap do React
-├── components/
-│   ├── Filters.jsx            # busca e filtro por tipo
-│   ├── Summary.jsx            # cards de receitas/despesas/saldo
-│   ├── TransactionForm.jsx    # formulário de criação e edição + validação
-│   └── TransactionList.jsx    # tabela com ações de editar/excluir
-├── hooks/
-│   └── useTransactions.js     # operações do CRUD (create/update/remove)
-├── services/
-│   └── storage.js             # leitura e escrita no localStorage
-├── styles/
-│   └── index.css
-└── utils/
-    └── format.js              # formatação de moeda e data (pt-BR)
+├── App.jsx                    # rotas públicas e protegidas
+├── main.jsx                   # BrowserRouter + AuthProvider
+├── api/
+│   ├── client.js              # fetch com token, renovação e ProblemDetails
+│   └── auth.js                # register / login / refresh / logout / me
+├── auth/
+│   ├── AuthProvider.jsx       # estado da sessão
+│   ├── authContext.js         # contexto e hook useAuth
+│   ├── tokenStorage.js        # access em memória, refresh no localStorage
+│   ├── RequireAuth.jsx        # guarda das rotas privadas
+│   └── RedirectIfAuthenticated.jsx
+├── pages/
+│   ├── LoginPage.jsx
+│   ├── RegisterPage.jsx
+│   └── TransactionsPage.jsx
+├── components/                # AppLayout, AuthLayout, Filters, Summary, ...
+├── hooks/useTransactions.js
+├── services/storage.js
+├── styles/index.css
+└── utils/format.js
 ```
 
-## Trocando por uma API
+## Como a sessão funciona
 
-A persistência está isolada em `src/services/storage.js` e o CRUD em
-`src/hooks/useTransactions.js`. Para usar um backend, basta substituir as
-chamadas dessas duas camadas por `fetch`; os componentes não mudam.
+O **access token fica só em memória**: some ao fechar a aba e nunca é exposto a um
+script que leia o `localStorage`. Apenas o **refresh token** é persistido, porque
+sem ele a sessão não sobreviveria a um F5 — e como a API o rotaciona a cada uso,
+um valor vazado deixa de valer no refresh seguinte.
+
+Ao abrir a aplicação, se existe um refresh token, ele é trocado por um novo par
+antes de qualquer decisão de rota. A guarda espera esse resultado; sem isso, quem
+está logado seria expulso a cada recarga.
+
+Quando uma chamada autenticada recebe 401, o cliente renova e repete a requisição
+**uma única vez**. Se várias chamadas falharem juntas, todas aguardam o mesmo
+refresh: dois refreshes simultâneos gastariam tokens da rotação e o servidor
+derrubaria a sessão por reuso.
+
+## Testes
+
+```bash
+npm test
+```
+
+`src/api/__tests__/client.test.js` cobre o cliente HTTP: envio do token, renovação
+após 401, repetição única, fila em voo do refresh, encerramento da sessão quando a
+renovação falha e a tradução dos erros por campo do `ProblemDetails`.
