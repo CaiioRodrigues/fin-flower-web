@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        # Endereço que o NAVEGADOR usa para chamar a API — por isso é a porta
+        # publicada no host, não o nome do serviço da rede do compose.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5212}
+    container_name: fin-flower-web
+    ports:
+      - "5173:80"

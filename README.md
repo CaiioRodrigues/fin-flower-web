@@ -56,6 +56,26 @@ npm run lint     # ESLint
 npm test         # Vitest
 ```
 
+## Com Docker
+
+```bash
+docker compose up -d --build
+```
+
+Serve o build em `http://localhost:5173` por nginx, com o fallback de rotas do
+lado do cliente — sem ele, recarregar em `/eventos/123` daria 404.
+
+O endereço da API é gravado no bundle **na construção da imagem**, porque é assim
+que o Vite trata as variáveis `VITE_*`. Para apontar para outro lugar:
+
+```bash
+VITE_API_URL=http://localhost:5212 docker compose up -d --build
+```
+
+Esse endereço é o que o **navegador** usa, então é a porta publicada no host — não
+o nome do serviço na rede do compose. A API precisa liberar `http://localhost:5173`
+no CORS; o compose dela já faz isso.
+
 ## Estrutura
 
 ```
