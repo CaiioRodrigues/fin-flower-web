@@ -40,8 +40,12 @@ npm install
 npm run dev
 ```
 
-A aplicação sobe em `http://localhost:5173`. A API precisa liberar essa origem no
-CORS — o `appsettings.Development.json` dela já vem com ela configurada.
+A aplicação sobe em `http://localhost:5173`, origem que a API já libera no CORS de
+desenvolvimento.
+
+A API roda em `http://localhost:5212` (e `https://localhost:7046`). Suba-a antes —
+pelo Visual Studio com F5, ou com `dotnet run --project src/FinFlower.Api` — senão
+o login falha por não haver com quem conversar.
 
 Outros comandos:
 
