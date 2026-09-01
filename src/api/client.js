@@ -6,7 +6,9 @@ import {
   setRefreshToken,
 } from '../auth/tokenStorage.js'
 
-const BASE_URL = (import.meta.env.VITE_API_URL ?? 'https://localhost:7001').replace(/\/$/, '')
+// Padrão igual à porta http de desenvolvimento da API, para quem ainda não criou
+// o .env.local não bater numa porta inexistente.
+const BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:5212').replace(/\/$/, '')
 
 /** Erro de API com o status e os erros por campo, quando a resposta os traz. */
 export class ApiError extends Error {
@@ -55,12 +57,24 @@ async function send(path, { method = 'GET', body, auth = true, signal } = {}) {
   const token = getAccessToken()
   if (auth && token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-    signal,
-  })
+  let response
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal,
+    })
+  } catch (networkError) {
+    // fetch só rejeita quando a requisição nem chegou: API fora do ar, endereço
+    // errado ou CORS. "Failed to fetch" não diz nada disso a quem está usando.
+    if (networkError.name === 'AbortError') throw networkError
+
+    throw new ApiError(
+      `Não foi possível falar com a API em ${BASE_URL}. Verifique se ela está rodando e se VITE_API_URL aponta para o endereço certo.`,
+      { code: 'network.unreachable' },
+    )
+  }
 
   if (!response.ok) throw await parseError(response)
   if (response.status === 204) return null

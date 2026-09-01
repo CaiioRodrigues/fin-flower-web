@@ -146,6 +146,34 @@ describe('cliente HTTP', () => {
     await expect(api.delete('/api/events/1')).resolves.toBeNull()
   })
 
+  it('explica quando a API está inalcançável', async () => {
+    // fetch rejeita, em vez de responder, quando a requisição nem chega.
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+
+    const error = await api.get('/api/events', { auth: false }).catch((thrown) => thrown)
+
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error.code).toBe('network.unreachable')
+    expect(error.message).toContain('VITE_API_URL')
+  })
+
+  it('não tenta renovar a sessão quando a falha é de rede', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(api.get('/api/events')).rejects.toThrow(ApiError)
+
+    // Sem status 401 não há o que renovar: uma tentativa, e só.
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
+  it('preserva o cancelamento da requisição', async () => {
+    const abort = new DOMException('cancelado', 'AbortError')
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(abort))
+
+    await expect(api.get('/api/events', { auth: false })).rejects.toThrow(abort)
+  })
+
   it('não quebra quando o corpo do erro não é JSON', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
