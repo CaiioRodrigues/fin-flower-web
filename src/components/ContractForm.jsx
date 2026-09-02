@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import MoneyInput from './MoneyInput.jsx'
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS } from '../utils/labels.js'
 import { addMonthsISO, formatCurrency, todayISO } from '../utils/format.js'
 
@@ -110,17 +111,13 @@ export default function ContractForm({ submitting, onSubmit, onCancel }) {
 
       <div className="row">
         <div className="field">
-          <label htmlFor="totalAmount">Valor total (R$)</label>
-          <input
+          <label htmlFor="totalAmount">Valor total</label>
+          <MoneyInput
             id="totalAmount"
             name="totalAmount"
-            type="number"
-            min="0"
-            step="0.01"
             value={values.totalAmount}
             onChange={handleChange}
-            placeholder="0,00"
-            aria-invalid={Boolean(errors.totalAmount)}
+            invalid={Boolean(errors.totalAmount)}
           />
           {errors.totalAmount && <span className="error">{errors.totalAmount}</span>}
         </div>

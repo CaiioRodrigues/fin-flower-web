@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react'
+import MoneyInput from './MoneyInput.jsx'
 import { INSTALLMENT_STATUS_LABELS, settleVerb, settlementLabel } from '../utils/labels.js'
 import { formatCurrency, formatDate } from '../utils/format.js'
 
@@ -46,13 +47,10 @@ function SettleRow({ installment, submitting, onConfirm, onCancel }) {
           </div>
 
           <div className="field">
-            <label htmlFor={`settled-amount-${installment.number}`}>Valor (R$)</label>
-            <input
+            <label htmlFor={`settled-amount-${installment.number}`}>Valor</label>
+            <MoneyInput
               id={`settled-amount-${installment.number}`}
               name="amount"
-              type="number"
-              min="0"
-              step="0.01"
               value={values.amount}
               onChange={handleChange}
               required

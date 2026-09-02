@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import MoneyInput from './MoneyInput.jsx'
 import { todayISO } from '../utils/format.js'
 
 const CATEGORIES = [
@@ -106,17 +107,13 @@ export default function EntryForm({ entry, eventDate, disabled, submitting, onSu
 
       <div className="row">
         <div className="field">
-          <label htmlFor="entry-amount">Valor (R$)</label>
-          <input
+          <label htmlFor="entry-amount">Valor</label>
+          <MoneyInput
             id="entry-amount"
             name="amount"
-            type="number"
-            min="0"
-            step="0.01"
             value={values.amount}
             onChange={handleChange}
-            placeholder="0,00"
-            aria-invalid={Boolean(errors.amount)}
+            invalid={Boolean(errors.amount)}
           />
           {errors.amount && <span className="error">{errors.amount}</span>}
         </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import Logo from './Logo.jsx'
 import { useAuth } from '../auth/authContext.js'
 
 export default function AppLayout() {
@@ -19,9 +20,12 @@ export default function AppLayout() {
   return (
     <div className="app">
       <header className="header topbar">
-        <div>
-          <h1>Fin Flower</h1>
-          <p className="muted">Controle financeiro por eventos</p>
+        <div className="brand">
+          <Logo size={38} />
+          <div>
+            <h1>Fin Flower</h1>
+            <p className="muted">Controle financeiro por eventos</p>
+          </div>
         </div>
 
         <div className="topbar-user">

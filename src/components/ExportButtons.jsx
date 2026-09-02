@@ -27,7 +27,7 @@ export default function ExportButtons({ label = 'Exportar', onExport, disabled }
 
       <button
         type="button"
-        className="btn small"
+        className="btn small excel"
         onClick={() => handleClick('xlsx')}
         disabled={disabled || downloading !== null}
       >
@@ -36,7 +36,7 @@ export default function ExportButtons({ label = 'Exportar', onExport, disabled }
 
       <button
         type="button"
-        className="btn small"
+        className="btn small pdf"
         onClick={() => handleClick('pdf')}
         disabled={disabled || downloading !== null}
       >
