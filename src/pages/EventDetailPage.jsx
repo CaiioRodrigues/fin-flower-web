@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import AsyncBoundary from '../components/AsyncBoundary.jsx'
+import ContractForm from '../components/ContractForm.jsx'
+import ContractList from '../components/ContractList.jsx'
 import EntryForm from '../components/EntryForm.jsx'
 import EntryList from '../components/EntryList.jsx'
 import EventForm from '../components/EventForm.jsx'
@@ -15,6 +17,7 @@ import {
   updateEntry,
   updateEvent,
 } from '../api/events.js'
+import { createContract, listContracts } from '../api/contracts.js'
 import { useAsync } from '../hooks/useAsync.js'
 import { formatCurrency, formatDate } from '../utils/format.js'
 
@@ -29,6 +32,14 @@ export default function EventDetailPage() {
 
   const load = useCallback(() => getEvent(eventId), [eventId])
   const { data: event, loading, error: loadError, reload } = useAsync(load, [load])
+
+  const loadContracts = useCallback(() => listContracts({ eventId }), [eventId])
+  const {
+    data: contracts,
+    loading: loadingContracts,
+    error: contractsError,
+    reload: reloadContracts,
+  } = useAsync(loadContracts, [loadContracts])
 
   /**
    * Toda ação recarrega o evento em vez de remendar o estado local: os totais
@@ -188,6 +199,36 @@ export default function EventDetailPage() {
                   onEdit={setEditingEntry}
                   onDelete={handleDeleteEntry}
                 />
+              </section>
+            </div>
+
+            <div className="page-intro">
+              <h3 className="section-title">Contratos</h3>
+              <p className="muted">
+                O que foi acordado e ainda vai entrar ou sair. Liquidar uma parcela cria o
+                lançamento correspondente acima.
+              </p>
+            </div>
+
+            <div className="content">
+              <ContractForm
+                submitting={submitting}
+                onSubmit={(values) =>
+                  run(async () => {
+                    await createContract(eventId, values)
+                    await reloadContracts()
+                  })
+                }
+              />
+
+              <section className="panel">
+                <AsyncBoundary
+                  loading={loadingContracts}
+                  error={contractsError}
+                  onRetry={reloadContracts}
+                >
+                  {contracts && <ContractList contracts={contracts} />}
+                </AsyncBoundary>
               </section>
             </div>
           </>

@@ -50,9 +50,13 @@ async function parseError(response) {
   return new ApiError(message, { status: response.status, code: problem?.code, fieldErrors })
 }
 
-async function send(path, { method = 'GET', body, auth = true, signal } = {}) {
-  const headers = { Accept: 'application/json' }
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+async function send(path, { method = 'GET', body, auth = true, signal, responseType = 'json' } = {}) {
+  // FormData carrega o próprio boundary no Content-Type: defini-lo aqui
+  // quebraria o envio do arquivo.
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
+
+  const headers = { Accept: responseType === 'blob' ? '*/*' : 'application/json' }
+  if (body !== undefined && !isFormData) headers['Content-Type'] = 'application/json'
 
   const token = getAccessToken()
   if (auth && token) headers.Authorization = `Bearer ${token}`
@@ -62,7 +66,7 @@ async function send(path, { method = 'GET', body, auth = true, signal } = {}) {
     response = await fetch(`${BASE_URL}${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined || isFormData ? body : JSON.stringify(body),
       signal,
     })
   } catch (networkError) {
@@ -79,7 +83,7 @@ async function send(path, { method = 'GET', body, auth = true, signal } = {}) {
   if (!response.ok) throw await parseError(response)
   if (response.status === 204) return null
 
-  return response.json()
+  return responseType === 'blob' ? response.blob() : response.json()
 }
 
 /**
@@ -145,4 +149,14 @@ export const api = {
   post: (path, body, options) => request(path, { ...options, method: 'POST', body }),
   put: (path, body, options) => request(path, { ...options, method: 'PUT', body }),
   delete: (path, options) => request(path, { ...options, method: 'DELETE' }),
+
+  /** Envia um arquivo. O navegador monta o multipart e o boundary. */
+  upload: (path, file) => {
+    const form = new FormData()
+    form.append('file', file)
+    return request(path, { method: 'POST', body: form })
+  },
+
+  /** Baixa um arquivo autenticado: um link comum não leva o token. */
+  download: (path) => request(path, { method: 'GET', responseType: 'blob' }),
 }
