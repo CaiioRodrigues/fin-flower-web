@@ -6,7 +6,9 @@ import {
   setRefreshToken,
 } from '../auth/tokenStorage.js'
 
-const BASE_URL = (import.meta.env.VITE_API_URL ?? 'https://localhost:7001').replace(/\/$/, '')
+// Padrão igual à porta http de desenvolvimento da API, para quem ainda não criou
+// o .env.local não bater numa porta inexistente.
+const BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:5212').replace(/\/$/, '')
 
 /** Erro de API com o status e os erros por campo, quando a resposta os traz. */
 export class ApiError extends Error {
@@ -48,24 +50,40 @@ async function parseError(response) {
   return new ApiError(message, { status: response.status, code: problem?.code, fieldErrors })
 }
 
-async function send(path, { method = 'GET', body, auth = true, signal } = {}) {
-  const headers = { Accept: 'application/json' }
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+async function send(path, { method = 'GET', body, auth = true, signal, responseType = 'json' } = {}) {
+  // FormData carrega o próprio boundary no Content-Type: defini-lo aqui
+  // quebraria o envio do arquivo.
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
+
+  const headers = { Accept: responseType === 'blob' ? '*/*' : 'application/json' }
+  if (body !== undefined && !isFormData) headers['Content-Type'] = 'application/json'
 
   const token = getAccessToken()
   if (auth && token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-    signal,
-  })
+  let response
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body === undefined || isFormData ? body : JSON.stringify(body),
+      signal,
+    })
+  } catch (networkError) {
+    // fetch só rejeita quando a requisição nem chegou: API fora do ar, endereço
+    // errado ou CORS. "Failed to fetch" não diz nada disso a quem está usando.
+    if (networkError.name === 'AbortError') throw networkError
+
+    throw new ApiError(
+      `Não foi possível falar com a API em ${BASE_URL}. Verifique se ela está rodando e se VITE_API_URL aponta para o endereço certo.`,
+      { code: 'network.unreachable' },
+    )
+  }
 
   if (!response.ok) throw await parseError(response)
   if (response.status === 204) return null
 
-  return response.json()
+  return responseType === 'blob' ? response.blob() : response.json()
 }
 
 /**
@@ -131,4 +149,14 @@ export const api = {
   post: (path, body, options) => request(path, { ...options, method: 'POST', body }),
   put: (path, body, options) => request(path, { ...options, method: 'PUT', body }),
   delete: (path, options) => request(path, { ...options, method: 'DELETE' }),
+
+  /** Envia um arquivo. O navegador monta o multipart e o boundary. */
+  upload: (path, file) => {
+    const form = new FormData()
+    form.append('file', file)
+    return request(path, { method: 'POST', body: form })
+  },
+
+  /** Baixa um arquivo autenticado: um link comum não leva o token. */
+  download: (path) => request(path, { method: 'GET', responseType: 'blob' }),
 }

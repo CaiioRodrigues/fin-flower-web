@@ -140,10 +140,74 @@ describe('cliente HTTP', () => {
     expect(error.fieldErrors.Password).toHaveLength(1)
   })
 
+  it('envia arquivo sem definir o Content-Type', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, { fileName: 'contrato.pdf' }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await api.upload('/api/contracts/1/document', new File(['%PDF-1.4'], 'contrato.pdf'))
+
+    const [, init] = fetchMock.mock.calls[0]
+    expect(init.body).toBeInstanceOf(FormData)
+    // Definir o Content-Type aqui apagaria o boundary que o navegador gera.
+    expect(init.headers['Content-Type']).toBeUndefined()
+    expect(init.headers.Authorization).toBe('Bearer access-velho')
+  })
+
+  it('baixa arquivo como blob, e não como json', async () => {
+    const blob = new Blob(['%PDF-1.4'], { type: 'application/pdf' })
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, blob: async () => blob })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await api.download('/api/contracts/1/document')
+
+    expect(result).toBe(blob)
+    expect(fetchMock.mock.calls[0][1].headers.Accept).toBe('*/*')
+  })
+
+  it('renova e repete também o download de arquivo', async () => {
+    const blob = new Blob(['%PDF-1.4'])
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(401, { detail: 'Token expirado.' }))
+      .mockResolvedValueOnce(jsonResponse(200, session('d')))
+      .mockResolvedValueOnce({ ok: true, status: 200, blob: async () => blob })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(api.download('/api/contracts/1/document')).resolves.toBe(blob)
+  })
+
   it('devolve null em respostas 204', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 204, json: async () => null }))
 
     await expect(api.delete('/api/events/1')).resolves.toBeNull()
+  })
+
+  it('explica quando a API está inalcançável', async () => {
+    // fetch rejeita, em vez de responder, quando a requisição nem chega.
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+
+    const error = await api.get('/api/events', { auth: false }).catch((thrown) => thrown)
+
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error.code).toBe('network.unreachable')
+    expect(error.message).toContain('VITE_API_URL')
+  })
+
+  it('não tenta renovar a sessão quando a falha é de rede', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(api.get('/api/events')).rejects.toThrow(ApiError)
+
+    // Sem status 401 não há o que renovar: uma tentativa, e só.
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
+  it('preserva o cancelamento da requisição', async () => {
+    const abort = new DOMException('cancelado', 'AbortError')
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(abort))
+
+    await expect(api.get('/api/events', { auth: false })).rejects.toThrow(abort)
   })
 
   it('não quebra quando o corpo do erro não é JSON', async () => {

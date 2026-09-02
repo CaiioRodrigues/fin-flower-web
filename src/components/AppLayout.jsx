@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../auth/authContext.js'
 
 export default function AppLayout() {
@@ -31,6 +31,18 @@ export default function AppLayout() {
           </button>
         </div>
       </header>
+
+      <nav className="nav">
+        <NavLink to="/" end className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+          Eventos
+        </NavLink>
+        <NavLink
+          to="/fluxo-de-caixa"
+          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+        >
+          Fluxo de caixa
+        </NavLink>
+      </nav>
 
       <Outlet />
     </div>

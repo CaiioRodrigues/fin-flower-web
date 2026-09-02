@@ -14,6 +14,14 @@ Consome inteiramente a [API](https://github.com/CaiioRodrigues/fin-flower-api).
 - Rotas protegidas — quem não tem sessão vai para o login e volta para a página pretendida
 - Logout revoga o refresh token no servidor
 
+**Contratos e fluxo de caixa**
+
+- Contratos por evento, a receber (cliente) e a pagar (fornecedor), com forma de pagamento e parcelamento
+- PDF do contrato anexado, aberto em aba nova pelo cliente autenticado
+- Liquidação de parcela pré-preenchida e editável — ajusta valor, data e categoria quando houve desconto ou juros
+- Estorno desfaz a parcela e o lançamento que ela criou
+- Painel de fluxo de caixa: vencido, mês corrente, previsão mês a mês e saldo projetado
+
 **Eventos**
 
 - Lista com entradas, saídas e resultado de cada evento, filtrável por período e situação
@@ -95,15 +103,18 @@ src/
 │   ├── LoginPage.jsx
 │   ├── RegisterPage.jsx
 │   ├── EventsPage.jsx         # caixa, filtros e lista de eventos
-│   └── EventDetailPage.jsx    # evento, seus lançamentos e ações
+│   ├── EventDetailPage.jsx    # evento, lançamentos e contratos
+│   ├── ContractDetailPage.jsx # contrato, parcelas e documento
+│   └── CashFlowPage.jsx       # vencido, mês corrente e previsão
 ├── components/                # AppLayout, CashSummary, EventList, EntryForm, ...
 ├── hooks/useAsync.js          # carregamento, erro e recarga
 ├── styles/index.css
 └── utils/format.js
 ```
 
-`api/events.js` concentra as chamadas de evento, lançamento e caixa; nenhuma tela
-monta URL na mão. `useAsync` descarta a resposta de uma chamada antiga quando
+`api/events.js` e `api/contracts.js` concentram as chamadas; nenhuma tela
+monta URL na mão. O download do PDF passa pelo cliente autenticado e vira uma URL
+local — um link comum não levaria o token. `useAsync` descarta a resposta de uma chamada antiga quando
 outra já começou — sem isso, trocar o filtro rápido deixaria a tela com o
 resultado errado.
 
@@ -136,4 +147,6 @@ renovação falha e a tradução dos erros por campo do `ProblemDetails`.
 Os fluxos de tela foram verificados no navegador contra um stub que implementa o
 mesmo contrato da API — autenticação, o cenário de cinco eventos com o caixa
 fechando em R$ 14.000, filtro por período, edição e exclusão de lançamento com
-recálculo do resultado, e o congelamento do evento fechado.
+recálculo do resultado, o congelamento do evento fechado, e o ciclo completo de
+contrato: parcelamento de R$ 1.000 em 3x sem perder centavos, upload de PDF,
+liquidação com desconto e estorno desfazendo os dois lados.
