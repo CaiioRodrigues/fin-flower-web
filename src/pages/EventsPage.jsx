@@ -2,9 +2,11 @@ import { useCallback, useMemo, useState } from 'react'
 import AsyncBoundary from '../components/AsyncBoundary.jsx'
 import CashSummary from '../components/CashSummary.jsx'
 import EventFilters from '../components/EventFilters.jsx'
+import ExportButtons from '../components/ExportButtons.jsx'
 import EventForm from '../components/EventForm.jsx'
 import EventList from '../components/EventList.jsx'
 import { createEvent, getCashReport, listEvents } from '../api/events.js'
+import { downloadCashReport } from '../api/reports.js'
 import { useAsync } from '../hooks/useAsync.js'
 
 const NO_FILTERS = { from: '', to: '', status: '' }
@@ -48,6 +50,13 @@ export default function EventsPage() {
         <p className="muted">
           Cada evento soma suas entradas e saídas; o caixa é a soma dos resultados.
         </p>
+
+        <div className="export-bar">
+          <ExportButtons
+            label="Caixa por evento:"
+            onExport={(format) => downloadCashReport(format, { from, to })}
+          />
+        </div>
       </div>
 
       <AsyncBoundary loading={loading} error={loadError} onRetry={reload}>

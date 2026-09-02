@@ -21,6 +21,7 @@ Consome inteiramente a [API](https://github.com/CaiioRodrigues/fin-flower-api).
 - Liquidação de parcela pré-preenchida e editável — ajusta valor, data e categoria quando houve desconto ou juros
 - Estorno desfaz a parcela e o lançamento que ela criou
 - Painel de fluxo de caixa: vencido, mês corrente, previsão mês a mês e saldo projetado
+- Exportação em Excel e PDF: caixa por evento, fluxo de caixa, parcelas em aberto e extrato do evento
 
 **Eventos**
 
@@ -113,8 +114,10 @@ src/
 ```
 
 `api/events.js` e `api/contracts.js` concentram as chamadas; nenhuma tela
-monta URL na mão. O download do PDF passa pelo cliente autenticado e vira uma URL
-local — um link comum não levaria o token. `useAsync` descarta a resposta de uma chamada antiga quando
+monta URL na mão. O download de arquivo — PDF do contrato e relatórios — passa pelo cliente
+autenticado e vira uma URL local; um link comum não levaria o token. O nome do
+arquivo é decidido no front porque o `Content-Disposition` da resposta não é
+legível pelo fetch entre origens sem expor o cabeçalho no CORS. `useAsync` descarta a resposta de uma chamada antiga quando
 outra já começou — sem isso, trocar o filtro rápido deixaria a tela com o
 resultado errado.
 

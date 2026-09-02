@@ -6,6 +6,7 @@ import ContractList from '../components/ContractList.jsx'
 import EntryForm from '../components/EntryForm.jsx'
 import EntryList from '../components/EntryList.jsx'
 import EventForm from '../components/EventForm.jsx'
+import ExportButtons from '../components/ExportButtons.jsx'
 import StatusBadge from '../components/StatusBadge.jsx'
 import {
   addEntry,
@@ -18,6 +19,7 @@ import {
   updateEvent,
 } from '../api/events.js'
 import { createContract, listContracts } from '../api/contracts.js'
+import { downloadEventStatement } from '../api/reports.js'
 import { useAsync } from '../hooks/useAsync.js'
 import { formatCurrency, formatDate } from '../utils/format.js'
 
@@ -115,6 +117,11 @@ export default function EventDetailPage() {
               </div>
 
               <div className="event-actions">
+                <ExportButtons
+                  label="Extrato:"
+                  disabled={submitting}
+                  onExport={(format) => downloadEventStatement(eventId, format, event.name)}
+                />
                 <button
                   type="button"
                   className="btn small"

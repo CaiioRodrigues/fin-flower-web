@@ -677,3 +677,23 @@ input[aria-invalid='true'] {
 .panel + .panel {
   margin-top: 24px;
 }
+
+/* --- Exportação de relatórios --------------------------------------------- */
+
+.export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.export .btn.small {
+  margin-left: 0;
+}
+
+.export-bar {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
