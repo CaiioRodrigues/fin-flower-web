@@ -7,6 +7,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    // Sem strictPort o Vite sobe na 5174 quando a 5173 está ocupada, e o CORS
+    // da API passa a barrar a origem — o navegador só diz "Failed to fetch".
+    // Melhor falhar na subida, dizendo que a porta está em uso.
+    strictPort: true,
     open: false,
   },
   test: {
