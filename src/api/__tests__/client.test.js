@@ -176,6 +176,37 @@ describe('cliente HTTP', () => {
     await expect(api.download('/api/contracts/1/document')).resolves.toBe(blob)
   })
 
+  it('salva o arquivo com o nome informado', async () => {
+    const blob = new Blob(['%PDF-1.4'], { type: 'application/pdf' })
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, blob: async () => blob }))
+    vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:local'), revokeObjectURL: vi.fn() })
+
+    const click = vi.fn()
+    const anchor = { click, remove: vi.fn(), href: '', download: '' }
+    vi.spyOn(document, 'createElement').mockReturnValue(anchor)
+    vi.spyOn(document.body, 'append').mockImplementation(() => {})
+
+    await api.saveAs('/api/reports/cash/export?format=pdf', 'caixa.pdf')
+
+    expect(anchor.download).toBe('caixa.pdf')
+    expect(anchor.href).toBe('blob:local')
+    expect(click).toHaveBeenCalledOnce()
+    // Não liberar a URL seguraria o arquivo inteiro em memória.
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:local')
+  })
+
+  it('propaga o erro sem baixar quando a exportação falha', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      jsonResponse(400, { detail: "Formato inválido. Use 'xlsx' ou 'pdf'." }),
+    ))
+    const createElement = vi.spyOn(document, 'createElement')
+
+    await expect(api.saveAs('/api/reports/cash/export?format=docx', 'x.docx'))
+      .rejects.toThrow('Formato inválido')
+
+    expect(createElement).not.toHaveBeenCalled()
+  })
+
   it('devolve null em respostas 204', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 204, json: async () => null }))
 

@@ -1,7 +1,9 @@
 import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AsyncBoundary from '../components/AsyncBoundary.jsx'
+import ExportButtons from '../components/ExportButtons.jsx'
 import { getCashFlow } from '../api/contracts.js'
+import { downloadCashFlow, downloadInstallments } from '../api/reports.js'
 import { useAsync } from '../hooks/useAsync.js'
 import { DIRECTION_LABELS } from '../utils/labels.js'
 import { formatCurrency, formatDate, formatMonth } from '../utils/format.js'
@@ -75,6 +77,17 @@ export default function CashFlowPage() {
         <p className="muted">
           O que já entrou e saiu, somado ao que está contratado — vencido, neste mês e nos próximos.
         </p>
+
+        <div className="export-bar">
+          <ExportButtons
+            label="Fluxo de caixa:"
+            onExport={(format) => downloadCashFlow(format, { monthsAhead })}
+          />
+          <ExportButtons
+            label="Parcelas em aberto:"
+            onExport={(format) => downloadInstallments(format)}
+          />
+        </div>
       </div>
 
       <AsyncBoundary loading={loading} error={error} onRetry={reload}>

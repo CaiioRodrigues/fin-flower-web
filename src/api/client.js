@@ -159,4 +159,23 @@ export const api = {
 
   /** Baixa um arquivo autenticado: um link comum não leva o token. */
   download: (path) => request(path, { method: 'GET', responseType: 'blob' }),
+
+  /**
+   * Baixa e salva com o nome informado. O nome vem de quem chama porque o
+   * Content-Disposition da resposta não é acessível pelo fetch entre origens
+   * sem expor o cabeçalho no CORS.
+   */
+  saveAs: async (path, fileName) => {
+    const blob = await request(path, { method: 'GET', responseType: 'blob' })
+    const url = URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.append(link)
+    link.click()
+    link.remove()
+
+    URL.revokeObjectURL(url)
+  },
 }
