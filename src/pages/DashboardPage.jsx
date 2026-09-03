@@ -12,17 +12,23 @@ import { useAsync } from '../hooks/useAsync.js'
 import { addMonths, competenceLongLabel, currentCompetence } from '../utils/competence.js'
 import { formatCurrency } from '../utils/format.js'
 
-const DEFAULT_MONTHS = 12
+const MONTHS_BACK = 5
+const MONTHS_AHEAD = 6
 
 /**
- * O caixa completo. É a primeira tela porque é a primeira pergunta de quem
- * abre o sistema: quanto entrou, quanto saiu, e com quanto eu fiquei.
+ * O caixa completo, numa linha do tempo só: o que já se moveu e o que está
+ * previsto. É a primeira tela porque é a primeira pergunta de quem abre o
+ * sistema — quanto entrou, quanto saiu, com quanto eu fiquei e o que vem aí.
+ *
+ * A janela nasce centrada no mês corrente pelo mesmo motivo: um caixa serve
+ * tanto para ver de onde se veio quanto para saber se dá para pagar as contas
+ * do trimestre.
  */
 export default function DashboardPage() {
   const today = currentCompetence()
   const [range, setRange] = useState({
-    from: addMonths(today, -(DEFAULT_MONTHS - 1)),
-    to: today,
+    from: addMonths(today, -MONTHS_BACK),
+    to: addMonths(today, MONTHS_AHEAD),
   })
 
   const { data, error, loading, reload } = useAsync(
@@ -38,7 +44,9 @@ export default function DashboardPage() {
       <header className="page-head">
         <div>
           <h2>Caixa</h2>
-          <p className="muted">Entradas e saídas de todo o negócio, mês a mês.</p>
+          <p className="muted">
+            Entradas e saídas de todo o negócio, mês a mês — o que já aconteceu e o que está previsto.
+          </p>
         </div>
         <ExportButtons
           label="Baixar o período"
@@ -62,22 +70,44 @@ export default function DashboardPage() {
             <MetricCards
               metrics={[
                 { label: 'Saldo em caixa', value: data.closingBalance, tone: 'result',
-                  hint: `no fim de ${competenceLongLabel(data.to)}` },
+                  hint: 'o que de fato se moveu' },
+                { label: 'Saldo projetado', value: data.projectedBalance, tone: 'result',
+                  hint: `se tudo previsto acontecer até ${competenceLongLabel(data.to)}` },
                 { label: 'Entradas do período', value: data.totalIncome, tone: 'income' },
                 { label: 'Saídas do período', value: data.totalExpense, tone: 'expense' },
                 { label: 'Resultado', value: data.result, tone: 'result',
                   hint: `média de ${formatCurrency(data.averageMonthlyResult)} por mês` },
                 { label: 'Custos fixos', value: data.totalFixedExpense },
                 { label: 'Pró-labore', value: data.totalProLabore },
+                { label: 'A entrar previsto', value: data.totalExpectedIncome, tone: 'income' },
               ]}
             />
 
-            {data.openingBalance !== 0 && (
-              <p className="muted">
-                O período começa com {formatCurrency(data.openingBalance)} vindos de antes de{' '}
-                {competenceLongLabel(data.from)}.
-              </p>
+            {(data.overdueReceivable > 0 || data.overduePayable > 0) && (
+              <div className="card status-card" role="status">
+                <p>
+                  <strong>Vencido e não liquidado:</strong>{' '}
+                  <span className="amount income">{formatCurrency(data.overdueReceivable)}</span> a
+                  receber e{' '}
+                  <span className="amount expense">{formatCurrency(data.overduePayable)}</span> a
+                  pagar. Não entra na projeção — é dívida de agora, não previsão de mês nenhum.{' '}
+                  <Link className="link" to="/parcelas">
+                    Ver as parcelas
+                  </Link>
+                </p>
+              </div>
             )}
+
+            <p className="muted">
+              {data.openingBalance !== 0 && (
+                <>
+                  O período começa com {formatCurrency(data.openingBalance)} vindos de antes de{' '}
+                  {competenceLongLabel(data.from)}.{' '}
+                </>
+              )}
+              A projeção conta só o que já está comprometido — parcelas de contratos assinados e
+              itens fixos. Trabalho que você ainda vai vender não aparece nela.
+            </p>
 
             <MonthlyCashTable
               months={data.months}

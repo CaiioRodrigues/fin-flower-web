@@ -20,7 +20,7 @@ export function downloadCashReport(format, { from, to } = {}) {
   if (from) search.set('from', from)
   if (to) search.set('to', to)
 
-  return api.saveAs(`/api/reports/cash/export?${search}`, fileName('caixa-por-evento', format))
+  return api.saveAs(`/api/reports/cash/export?${search}`, fileName('resultado-por-evento', format))
 }
 
 export function downloadCashFlow(format, { monthsAhead = 6 } = {}) {

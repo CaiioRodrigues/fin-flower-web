@@ -1,6 +1,11 @@
 import { formatCurrency } from '../utils/format.js'
 
-/** Painel do caixa: quanto entrou, quanto saiu, o saldo e como os eventos foram. */
+/**
+ * Resultado dos eventos — e não "caixa". Este painel soma apenas o que está
+ * preso a um evento, e desde que o lançamento saiu de dentro do evento a maior
+ * parte do custo do mês (aluguel, contador, pró-labore) ficou de fora. Chamar
+ * de saldo daria um número que discorda do caixa mensal: errado com cara de certo.
+ */
 export default function CashSummary({ report }) {
   const balancePositive = report.balance >= 0
 
@@ -17,10 +22,11 @@ export default function CashSummary({ report }) {
       </div>
 
       <div className="card stat">
-        <span className="muted">Caixa</span>
+        <span className="muted">Resultado dos eventos</span>
         <strong className={balancePositive ? 'income' : 'expense'}>
           {formatCurrency(report.balance)}
         </strong>
+        <span className="muted small-text">não é o saldo do caixa</span>
       </div>
 
       <div className="card stat">
