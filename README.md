@@ -85,6 +85,24 @@ Esse endereço é o que o **navegador** usa, então é a porta publicada no host
 o nome do serviço na rede do compose. A API precisa liberar `http://localhost:5173`
 no CORS; o compose dela já faz isso.
 
+## Identidade visual
+
+A marca é uma flor com uma moeda no miolo — flor pelo formato, dinheiro pelo
+centro. Fica legível a partir de 16px, que é o tamanho do favicon.
+
+O **azul** é a cor da marca e das ações de criar. **Verde e vermelho ficam
+reservados ao significado financeiro** — entrou dinheiro, saiu dinheiro — porque
+usá-los também como cor de interface tiraria a força de quem precisa dela.
+
+Os botões seguem o que a ação faz:
+
+| Ação | Cor |
+|---|---|
+| Criar, adicionar, confirmar | Azul preenchido |
+| Excluir | Vermelho preenchido, a ação mais forte da tela |
+| Excel | Verde do Excel, tonalizado |
+| PDF | Vermelho do PDF, tonalizado |
+
 ## Estrutura
 
 ```
@@ -110,7 +128,10 @@ src/
 ├── components/                # AppLayout, CashSummary, EventList, EntryForm, ...
 ├── hooks/useAsync.js          # carregamento, erro e recarga
 ├── styles/index.css
-└── utils/format.js
+└── utils/
+    ├── format.js              # moeda e data em pt-BR
+    ├── labels.js              # rótulos dos enums da API
+    └── money.js               # máscara de dinheiro em centavos
 ```
 
 `api/events.js` e `api/contracts.js` concentram as chamadas; nenhuma tela
@@ -136,6 +157,16 @@ Quando uma chamada autenticada recebe 401, o cliente renova e repete a requisiç
 **uma única vez**. Se várias chamadas falharem juntas, todas aguardam o mesmo
 refresh: dois refreshes simultâneos gastariam tokens da rotação e o servidor
 derrubaria a sessão por reuso.
+
+## Campos de dinheiro
+
+O valor é digitado só com dígitos e a máscara monta da direita para a esquerda:
+`123456` vira `1.234,56`. É a convenção dos sistemas financeiros brasileiros e
+evita ambiguidade — não existe "digitei 1000, era mil reais ou dez reais?".
+
+Internamente o cálculo é feito em **centavos inteiros**: `335.99 * 100` dá
+`33598.999…` em ponto flutuante, e arredondar na conversão evita o centavo
+perdido.
 
 ## Testes
 
