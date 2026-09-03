@@ -32,3 +32,28 @@ export function settlementLabel(direction) {
 export function settleVerb(direction) {
   return direction === 'Payable' ? 'Pagar' : 'Receber'
 }
+
+export const ENTRY_TYPE_LABELS = {
+  Income: 'Entrada',
+  Expense: 'Saída',
+}
+
+/** De onde o lançamento veio — define o que a tela deixa editar. */
+export const ENTRY_SOURCE_LABELS = {
+  Manual: 'Manual',
+  Contract: 'Contrato',
+  Recurring: 'Fixo',
+}
+
+export const RECURRING_KIND_LABELS = {
+  FixedExpense: 'Gasto fixo',
+  ProLabore: 'Pró-labore',
+  FixedIncome: 'Receita fixa',
+}
+
+export const QUOTE_STATUS_LABELS = {
+  Draft: 'Rascunho',
+  Sent: 'Enviado',
+  Approved: 'Aprovado',
+  Rejected: 'Recusado',
+}

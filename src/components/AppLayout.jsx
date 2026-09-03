@@ -3,6 +3,18 @@ import { NavLink, Outlet } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import { useAuth } from '../auth/authContext.js'
 
+/** A ordem segue o uso: primeiro o caixa, depois o que o alimenta. */
+const LINKS = [
+  { to: '/', label: 'Caixa', end: true },
+  { to: '/lancamentos', label: 'Lançamentos' },
+  { to: '/gastos-fixos', label: 'Gastos fixos' },
+  { to: '/pro-labore', label: 'Pró-labore' },
+  { to: '/orcamentos', label: 'Orçamentos' },
+  { to: '/eventos', label: 'Eventos' },
+  { to: '/fluxo-de-caixa', label: 'Fluxo de caixa' },
+  { to: '/relatorios', label: 'Relatórios' },
+]
+
 export default function AppLayout() {
   const { user, signOut } = useAuth()
   const [signingOut, setSigningOut] = useState(false)
@@ -24,7 +36,7 @@ export default function AppLayout() {
           <Logo size={38} />
           <div>
             <h1>Fin Flower</h1>
-            <p className="muted">Controle financeiro por eventos</p>
+            <p className="muted">Controle financeiro do seu negócio</p>
           </div>
         </div>
 
@@ -37,15 +49,16 @@ export default function AppLayout() {
       </header>
 
       <nav className="nav">
-        <NavLink to="/" end className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          Eventos
-        </NavLink>
-        <NavLink
-          to="/fluxo-de-caixa"
-          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-        >
-          Fluxo de caixa
-        </NavLink>
+        {LINKS.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            end={link.end}
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+          >
+            {link.label}
+          </NavLink>
+        ))}
       </nav>
 
       <Outlet />

@@ -888,3 +888,437 @@ select,
 textarea {
   max-width: 100%;
 }
+
+/* --- Caixa mensal, livro-caixa, fixos e orçamentos ------------------------ */
+
+.stack {
+  display: grid;
+  gap: 20px;
+}
+
+/* Item de grid nasce com min-width: auto e não encolhe abaixo do próprio
+   conteúdo mínimo — basta um irmão largo (uma tabela, uma faixa de números)
+   para a coluna inteira esticar e empurrar o título para fora da margem. */
+.stack > * {
+  min-width: 0;
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-head h2,
+.page-head h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.page-head p {
+  margin: 4px 0 0;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+}
+
+/* min-width: 0 impede que uma tabela larga estique a coluna e empurre o
+   conteúdo para fora da margem — o mesmo motivo dos campos de data. */
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.columns > * {
+  min-width: 0;
+}
+
+.columns.wide-first {
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+}
+
+/* --- Seleção de competência ----------------------------------------------- */
+
+.month-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.month-picker-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.month-picker-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Só a primeira letra: 'capitalize' no elemento inteiro escrevia "Setembro De
+   2026", com a preposição em maiúscula. */
+.month-picker-label::first-letter {
+  text-transform: uppercase;
+}
+
+.month-input {
+  min-width: 0;
+  max-width: 170px;
+}
+
+.btn.icon {
+  padding: 6px 12px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.range-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.range-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Faixa de números ----------------------------------------------------- */
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  min-width: 0;
+}
+
+.metric-label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Dinheiro nunca quebra no meio: "R$ 70.438,0" numa linha e "0" na outra é
+   ilegível e engana. O tamanho acompanha a largura disponível em vez de forçar
+   a quebra. */
+.metric-value {
+  display: block;
+  font-size: clamp(16px, 1.5vw, 20px);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.metric-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.metric.income .metric-value {
+  color: var(--income);
+}
+
+.metric.expense .metric-value {
+  color: var(--expense);
+}
+
+/* --- Tabelas -------------------------------------------------------------- */
+
+.amount.strong {
+  font-weight: 700;
+}
+
+.muted-cell {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mês sem movimento continua na série, mas não disputa a atenção. */
+.row-quiet td {
+  color: var(--muted);
+}
+
+.tag.good {
+  background: #e9f5ee;
+  color: var(--income);
+}
+
+.tag.bad {
+  background: var(--danger-soft);
+  color: var(--expense);
+}
+
+.tag.origin {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.small-text {
+  font-size: 12px;
+}
+
+.link {
+  color: var(--primary-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* --- Composição por categoria --------------------------------------------- */
+
+.breakdown {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.breakdown-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.breakdown-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg);
+  margin: 4px 0 2px;
+  overflow: hidden;
+}
+
+.breakdown-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  min-width: 2px;
+}
+
+.breakdown-bar span.income {
+  background: var(--income);
+}
+
+.breakdown-bar span.expense {
+  background: var(--expense);
+}
+
+/* --- Formulários ---------------------------------------------------------- */
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.filter-row .field {
+  min-width: 150px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+/* Entrada ou saída é a primeira decisão do lançamento: um par de botões diz
+   isso melhor que um <select> escondido no meio do formulário. */
+.segmented {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.segment {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segment:hover {
+  background: var(--bg);
+}
+
+.segment.active.income {
+  background: #e9f5ee;
+  color: var(--income);
+}
+
+.segment.active.expense {
+  background: var(--danger-soft);
+  color: var(--expense);
+}
+
+.item-form {
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.card.accent {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.report-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-card h3 {
+  margin: 0;
+}
+
+.report-card p {
+  margin: 0;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 12px 0 0;
+}
+
+.details dt {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.details dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.notes {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  white-space: pre-wrap;
+  color: var(--muted);
+}
+
+/* --- Situações ------------------------------------------------------------ */
+
+.badge.draft {
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.badge.sent {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.badge.approved,
+.badge.settled {
+  background: #e9f5ee;
+  color: var(--income);
+}
+
+.badge.rejected {
+  background: var(--danger-soft);
+  color: var(--expense);
+}
+
+@media (max-width: 960px) {
+  .columns.wide-first {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .month-picker,
+  .range-picker {
+    width: 100%;
+  }
+
+  .month-picker-center {
+    flex: 1;
+  }
+
+  /* O campo nativo já mostra o mês: repetir o rótulo ao lado dele só espreme
+     os dois em telas estreitas. */
+  .month-picker-label {
+    display: none;
+  }
+
+  .month-input {
+    max-width: none;
+    flex: 1;
+  }
+
+  .filter-row .field {
+    min-width: 0;
+    flex: 1 1 140px;
+  }
+
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions .btn {
+    flex: 1;
+  }
+}

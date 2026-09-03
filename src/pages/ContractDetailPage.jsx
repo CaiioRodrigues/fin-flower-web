@@ -69,8 +69,13 @@ export default function ContractDetailPage() {
     <>
       <div className="page-intro">
         {contract && (
-          <Link to={`/eventos/${contract.eventId}`} className="back-link">
-            ← Voltar para o evento
+          // O contrato pode não pertencer a evento nenhum: nesse caso o caminho
+          // de volta é a lista de contratos em aberto.
+          <Link
+            to={contract.eventId ? `/eventos/${contract.eventId}` : '/fluxo-de-caixa'}
+            className="back-link"
+          >
+            {contract.eventId ? '← Voltar para o evento' : '← Voltar para o fluxo de caixa'}
           </Link>
         )}
       </div>
@@ -91,6 +96,7 @@ export default function ContractDetailPage() {
                   {PAYMENT_METHOD_LABELS[contract.paymentMethod]} · assinado em{' '}
                   {formatDate(contract.signedOn)}
                   {contract.description ? ` · ${contract.description}` : ''}
+                  {contract.quoteId ? ` · do orçamento ${contract.quoteNumber}` : ''}
                 </p>
               </div>
 

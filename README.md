@@ -1,10 +1,66 @@
 # Fin Flower Web
 
-Front-end do Fin Flower em React + Vite. Controle financeiro **por evento**:
-cada evento soma suas entradas e saídas, e o caixa é a soma dos resultados.
+Front-end do Fin Flower em React + Vite. O centro é o **livro-caixa**: toda
+entrada e saída de dinheiro do negócio, apurada mês a mês. O evento é um
+atributo opcional do lançamento — serve para apurar resultado por trabalho —,
+não o dono dele.
 Consome inteiramente a [API](https://github.com/CaiioRodrigues/fin-flower-api).
 
 ## Funcionalidades
+
+**Caixa mês a mês** — a tela inicial
+
+- Entradas, saídas, resultado e **saldo acumulado** de cada mês: cada linha abre
+  com o fechamento da anterior, então ler de cima a baixo conta a história do dinheiro
+- Saldo que vinha de antes da janela, para o primeiro mês não começar do zero
+- Custo fixo e pró-labore destacados dentro do mês — retirada de sócio não é custo do negócio
+- Melhor e pior mês do período; meses sem movimento continuam na série, porque
+  um buraco esconderia justamente o mês em que nada entrou
+- Composição por categoria do mês em foco
+
+**Lançamentos**
+
+- Livro-caixa com filtro por mês, tipo, origem, evento, categoria e busca
+- Os totais são **do filtro inteiro, não da página**: quem olha o mês quer o saldo do mês
+- Evento é opcional no formulário — aluguel e contador não pertencem a trabalho nenhum
+- O que veio de contrato aparece na lista mas não é editável: quem manda é a parcela
+- O formulário mantém tipo, categoria e data ao lançar em sequência
+
+**Gastos fixos e pró-labore**
+
+- Mesma tela para os dois, separadas por natureza, porque quem opera olha para elas
+  em momentos diferentes
+- "Lançar o mês" materializa a competência no caixa; clicar de novo não duplica
+- Alterar o valor vale para os meses ainda não lançados: o aluguel de março já foi pago
+- Suspender para de gerar sem apagar o histórico
+
+**Orçamentos**
+
+- Proposta montada linha a linha, com quantidade, unidade, unitário e desconto
+- Fluxo rascunho → enviado → aprovado ou recusado; recusado pode ser reaberto
+- Aprovar gera o contrato com as parcelas e leva direto a ele — é o momento em que
+  a venda vira previsão de caixa
+
+**Contratos e fluxo de caixa**
+
+- Contratos a receber (cliente) e a pagar (fornecedor), com ou sem evento
+- PDF do contrato anexado, aberto em aba nova pelo cliente autenticado
+- Liquidação de parcela pré-preenchida e editável — ajusta valor, data e categoria quando houve desconto ou juros
+- Estorno desfaz a parcela e o lançamento que ela criou
+- Painel de fluxo de caixa: vencido, mês corrente, previsão mês a mês e saldo projetado
+
+**Eventos**
+
+- Lista com entradas, saídas e resultado de cada evento, filtrável por período e situação
+- Fechar consolida o resultado; o servidor recusa alterar lançamento de evento fechado
+- Excluir um evento com lançamentos é recusado: o dinheiro é do caixa, e decidir
+  o destino de cada lançamento é de quem opera
+
+**Relatórios**
+
+- Uma tela só para tirar os quatro relatórios em Excel ou PDF: caixa mês a mês,
+  caixa por evento, fluxo de caixa e parcelas em aberto
+- Extrato de um evento específico, com lançamentos, contratos e parcelas
 
 **Autenticação**
 
@@ -14,30 +70,7 @@ Consome inteiramente a [API](https://github.com/CaiioRodrigues/fin-flower-api).
 - Rotas protegidas — quem não tem sessão vai para o login e volta para a página pretendida
 - Logout revoga o refresh token no servidor
 
-**Contratos e fluxo de caixa**
-
-- Contratos por evento, a receber (cliente) e a pagar (fornecedor), com forma de pagamento e parcelamento
-- PDF do contrato anexado, aberto em aba nova pelo cliente autenticado
-- Liquidação de parcela pré-preenchida e editável — ajusta valor, data e categoria quando houve desconto ou juros
-- Estorno desfaz a parcela e o lançamento que ela criou
-- Painel de fluxo de caixa: vencido, mês corrente, previsão mês a mês e saldo projetado
-- Exportação em Excel e PDF: caixa por evento, fluxo de caixa, parcelas em aberto e extrato do evento
-
-**Eventos**
-
-- Lista com entradas, saídas e resultado de cada evento, filtrável por período e situação
-- Criar, editar e excluir evento; fechar para consolidar e reabrir quando precisar
-- Evento fechado esconde o formulário e as ações de lançamento
-
-**Lançamentos**
-
-- Cadastro, edição e exclusão dentro do evento, com validação e categorias
-- Cada alteração relê o evento no servidor, para a tela mostrar o mesmo número que o caixa
-
-**Caixa consolidado**
-
-- Entradas, saídas e saldo do período, mais quantos eventos deram lucro, prejuízo ou fecharam no zero
-- Layout responsivo — a tabela vira cards no mobile
+Layout responsivo em todas as telas: as tabelas viram cards no celular.
 
 ## Como rodar
 
@@ -111,6 +144,11 @@ src/
 ├── main.jsx                   # BrowserRouter + AuthProvider
 ├── api/
 │   ├── client.js              # fetch com token, renovação e ProblemDetails
+│   ├── query.js               # monta query string ignorando filtro vazio
+│   ├── entries.js             # livro-caixa
+│   ├── cash.js                # fechamento mensal
+│   ├── recurring.js           # gastos fixos e pró-labore
+│   ├── quotes.js              # orçamentos
 │   └── auth.js                # register / login / refresh / logout / me
 ├── auth/
 │   ├── AuthProvider.jsx       # estado da sessão
@@ -119,23 +157,34 @@ src/
 │   ├── RequireAuth.jsx        # guarda das rotas privadas
 │   └── RedirectIfAuthenticated.jsx
 ├── pages/
-│   ├── LoginPage.jsx
-│   ├── RegisterPage.jsx
-│   ├── EventsPage.jsx         # caixa, filtros e lista de eventos
+│   ├── DashboardPage.jsx      # caixa mês a mês (tela inicial)
+│   ├── LedgerPage.jsx         # livro-caixa
+│   ├── RecurringPage.jsx      # gastos fixos e pró-labore
+│   ├── QuotesPage.jsx         # lista de orçamentos
+│   ├── QuoteDetailPage.jsx    # montador da proposta e aprovação
+│   ├── ReportsPage.jsx        # os quatro relatórios num lugar só
+│   ├── EventsPage.jsx         # eventos e o resultado de cada um
 │   ├── EventDetailPage.jsx    # evento, lançamentos e contratos
 │   ├── ContractDetailPage.jsx # contrato, parcelas e documento
-│   └── CashFlowPage.jsx       # vencido, mês corrente e previsão
-├── components/                # AppLayout, CashSummary, EventList, EntryForm, ...
+│   ├── CashFlowPage.jsx       # vencido, mês corrente e previsão
+│   ├── LoginPage.jsx
+│   └── RegisterPage.jsx
+├── components/                # MonthPicker, MonthlyCashTable, LedgerForm, ...
 ├── hooks/useAsync.js          # carregamento, erro e recarga
 ├── styles/index.css
 └── utils/
+    ├── competence.js          # mês "aaaa-mm": aritmética, rótulo e intervalo
     ├── format.js              # moeda e data em pt-BR
     ├── labels.js              # rótulos dos enums da API
     └── money.js               # máscara de dinheiro em centavos
 ```
 
-`api/events.js` e `api/contracts.js` concentram as chamadas; nenhuma tela
-monta URL na mão. O download de arquivo — PDF do contrato e relatórios — passa pelo cliente
+Os módulos de `api/` concentram as chamadas; nenhuma tela monta URL na mão.
+
+**Competência é mês, não data.** `utils/competence.js` trata `"2026-09"` como um
+mês inteiro. Usar `DateOnly` para isso convidaria ao erro de `>= 01/09` deixar o
+resto de setembro de fora, e `competenceRange` devolve o primeiro e o **último**
+dia do mês — inclusive 29/02 em ano bissexto. O download de arquivo — PDF do contrato e relatórios — passa pelo cliente
 autenticado e vira uma URL local; um link comum não levaria o token. O nome do
 arquivo é decidido no front porque o `Content-Disposition` da resposta não é
 legível pelo fetch entre origens sem expor o cabeçalho no CORS. `useAsync` descarta a resposta de uma chamada antiga quando

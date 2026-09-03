@@ -14,8 +14,9 @@ export function getContract(contractId) {
   return api.get(`/api/contracts/${contractId}`)
 }
 
-export function createContract(eventId, contract) {
-  return api.post(`/api/events/${eventId}/contracts`, contract)
+/** O evento vai no corpo e é opcional: há contrato que não pertence a evento nenhum. */
+export function createContract(contract) {
+  return api.post('/api/contracts', contract)
 }
 
 export function updateContract(contractId, contract) {

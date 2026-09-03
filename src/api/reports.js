@@ -7,6 +7,14 @@ function fileName(stem, format) {
   return `${stem}-${date}.${EXTENSIONS[format]}`
 }
 
+export function downloadMonthlyCash(format, { from, to } = {}) {
+  const search = new URLSearchParams({ format })
+  if (from) search.set('from', from)
+  if (to) search.set('to', to)
+
+  return api.saveAs(`/api/reports/monthly/export?${search}`, fileName('caixa-mensal', format))
+}
+
 export function downloadCashReport(format, { from, to } = {}) {
   const search = new URLSearchParams({ format })
   if (from) search.set('from', from)
