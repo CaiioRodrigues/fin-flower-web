@@ -3,21 +3,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import AsyncBoundary from '../components/AsyncBoundary.jsx'
 import ContractForm from '../components/ContractForm.jsx'
 import ContractList from '../components/ContractList.jsx'
-import EntryForm from '../components/EntryForm.jsx'
-import EntryList from '../components/EntryList.jsx'
+import LedgerForm from '../components/LedgerForm.jsx'
+import LedgerTable from '../components/LedgerTable.jsx'
 import EventForm from '../components/EventForm.jsx'
 import ExportButtons from '../components/ExportButtons.jsx'
 import StatusBadge from '../components/StatusBadge.jsx'
-import {
-  addEntry,
-  closeEvent,
-  deleteEvent,
-  getEvent,
-  removeEntry,
-  reopenEvent,
-  updateEntry,
-  updateEvent,
-} from '../api/events.js'
+import { closeEvent, deleteEvent, getEvent, reopenEvent, updateEvent } from '../api/events.js'
+import { createEntry, deleteEntry, updateEntry } from '../api/entries.js'
 import { createContract, listContracts } from '../api/contracts.js'
 import { downloadEventStatement } from '../api/reports.js'
 import { useAsync } from '../hooks/useAsync.js'
@@ -67,20 +59,23 @@ export default function EventDetailPage() {
   )
 
   function handleDeleteEvent() {
-    if (!window.confirm(`Excluir o evento "${event.name}" e todos os seus lançamentos?`)) return
-    run(() => deleteEvent(eventId), { after: () => navigate('/', { replace: true }) })
+    // O evento com lançamentos é recusado pelo servidor: o dinheiro é do caixa,
+    // e mover ou excluir cada lançamento é decisão de quem opera.
+    if (!window.confirm(`Excluir o evento "${event.name}"?`)) return
+    run(() => deleteEvent(eventId), { after: () => navigate('/eventos', { replace: true }) })
   }
 
   function handleDeleteEntry(entry) {
     if (!window.confirm(`Excluir o lançamento "${entry.description}"?`)) return
     if (editingEntry?.id === entry.id) setEditingEntry(null)
-    run(() => removeEntry(eventId, entry.id))
+    run(() => deleteEntry(entry.id))
   }
 
   async function handleSubmitEntry(values) {
     await run(async () => {
-      if (editingEntry) await updateEntry(eventId, editingEntry.id, values)
-      else await addEntry(eventId, values)
+      // O lançamento é do caixa; o evento entra como atributo dele.
+      if (editingEntry) await updateEntry(editingEntry.id, values)
+      else await createEntry(values)
       setEditingEntry(null)
     })
   }
@@ -97,7 +92,7 @@ export default function EventDetailPage() {
   return (
     <>
       <div className="page-intro">
-        <Link to="/" className="back-link">
+        <Link to="/eventos" className="back-link">
           ← Voltar para os eventos
         </Link>
       </div>
@@ -189,24 +184,30 @@ export default function EventDetailPage() {
               </div>
             )}
 
-            <div className="content">
-              <EntryForm
-                entry={editingEntry}
-                eventDate={event.eventDate}
-                disabled={isClosed}
-                submitting={submitting}
-                onSubmit={handleSubmitEntry}
-                onCancel={() => setEditingEntry(null)}
-              />
-
+            <div className="columns wide-first">
               <section className="panel">
-                <EntryList
+                <LedgerTable
                   entries={event.entries}
-                  readOnly={isClosed}
-                  onEdit={setEditingEntry}
-                  onDelete={handleDeleteEntry}
+                  onEdit={isClosed ? undefined : setEditingEntry}
+                  onDelete={isClosed ? undefined : handleDeleteEntry}
                 />
               </section>
+
+              {isClosed ? (
+                <div className="card empty">
+                  <p>Evento fechado.</p>
+                  <p className="muted">Reabra o evento para incluir ou alterar lançamentos.</p>
+                </div>
+              ) : (
+                <LedgerForm
+                  entry={editingEntry}
+                  events={[event]}
+                  defaults={{ occurredOn: event.eventDate, eventId }}
+                  submitting={submitting}
+                  onSubmit={handleSubmitEntry}
+                  onCancel={() => setEditingEntry(null)}
+                />
+              )}
             </div>
 
             <div className="page-intro">
@@ -222,7 +223,7 @@ export default function EventDetailPage() {
                 submitting={submitting}
                 onSubmit={(values) =>
                   run(async () => {
-                    await createContract(eventId, values)
+                    await createContract({ ...values, eventId })
                     await reloadContracts()
                   })
                 }
