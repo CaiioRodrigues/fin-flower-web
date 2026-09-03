@@ -8,10 +8,17 @@ Consome inteiramente a [API](https://github.com/CaiioRodrigues/fin-flower-api).
 
 ## Funcionalidades
 
-**Caixa mês a mês** — a tela inicial
+**Caixa** — a tela inicial
+
+Uma linha do tempo só: meses passados pelo que de fato se moveu, meses futuros
+pelo que está previsto, com uma linha marcando onde um acaba e o outro começa.
 
 - Entradas, saídas, resultado e **saldo acumulado** de cada mês: cada linha abre
   com o fechamento da anterior, então ler de cima a baixo conta a história do dinheiro
+- **Saldo projetado** para os meses à frente, contando parcelas de contrato em
+  aberto *e* os itens fixos que ainda vão sair — contar só as parcelas mostraria
+  receita entrando sem o custo que vem junto
+- Vencido aparece à parte: é dívida de agora, não previsão de mês nenhum
 - Saldo que vinha de antes da janela, para o primeiro mês não começar do zero
 - Custo fixo e pró-labore destacados dentro do mês — retirada de sócio não é custo do negócio
 - Melhor e pior mês do período; meses sem movimento continuam na série, porque
@@ -41,17 +48,21 @@ Consome inteiramente a [API](https://github.com/CaiioRodrigues/fin-flower-api).
 - Aprovar gera o contrato com as parcelas e leva direto a ele — é o momento em que
   a venda vira previsão de caixa
 
-**Contratos e fluxo de caixa**
+**Contratos e parcelas**
 
 - Contratos a receber (cliente) e a pagar (fornecedor), com ou sem evento
 - PDF do contrato anexado, aberto em aba nova pelo cliente autenticado
 - Liquidação de parcela pré-preenchida e editável — ajusta valor, data e categoria quando houve desconto ou juros
 - Estorno desfaz a parcela e o lançamento que ela criou
-- Painel de fluxo de caixa: vencido, mês corrente, previsão mês a mês e saldo projetado
+- A tela **Parcelas** é a lista de cobrança: o que está vencido e o que vem a
+  vencer. A projeção que vivia nela foi para o caixa, onde se mistura ao
+  realizado na mesma linha do tempo
 
 **Eventos**
 
 - Lista com entradas, saídas e resultado de cada evento, filtrável por período e situação
+- O consolidado dali chama-se **resultado dos eventos**, não "caixa": ele soma só
+  o que foi lançado com evento, e a maior parte do custo de um mês não é
 - Fechar consolida o resultado; o servidor recusa alterar lançamento de evento fechado
 - Excluir um evento com lançamentos é recusado: o dinheiro é do caixa, e decidir
   o destino de cada lançamento é de quem opera
@@ -157,7 +168,7 @@ src/
 │   ├── RequireAuth.jsx        # guarda das rotas privadas
 │   └── RedirectIfAuthenticated.jsx
 ├── pages/
-│   ├── DashboardPage.jsx      # caixa mês a mês (tela inicial)
+│   ├── DashboardPage.jsx      # caixa: realizado e previsto (tela inicial)
 │   ├── LedgerPage.jsx         # livro-caixa
 │   ├── RecurringPage.jsx      # gastos fixos e pró-labore
 │   ├── QuotesPage.jsx         # lista de orçamentos
@@ -166,7 +177,7 @@ src/
 │   ├── EventsPage.jsx         # eventos e o resultado de cada um
 │   ├── EventDetailPage.jsx    # evento, lançamentos e contratos
 │   ├── ContractDetailPage.jsx # contrato, parcelas e documento
-│   ├── CashFlowPage.jsx       # vencido, mês corrente e previsão
+│   ├── InstallmentsPage.jsx   # a lista de cobrança: vencidas e a vencer
 │   ├── LoginPage.jsx
 │   └── RegisterPage.jsx
 ├── components/                # MonthPicker, MonthlyCashTable, LedgerForm, ...

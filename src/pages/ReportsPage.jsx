@@ -52,8 +52,8 @@ export default function ReportsPage() {
         <article className="card report-card">
           <h3>Caixa mês a mês</h3>
           <p className="muted">
-            Entradas, saídas, resultado e saldo acumulado de cada mês, mais as categorias somadas do
-            período. É o retrato completo do caixa.
+            Entradas, saídas, resultado e saldo acumulado de cada mês, com o previsto dos meses
+            futuros e as categorias somadas do período. É o retrato completo do caixa.
           </p>
           <ExportButtons
             label="Baixar"
@@ -62,10 +62,10 @@ export default function ReportsPage() {
         </article>
 
         <article className="card report-card">
-          <h3>Caixa por evento</h3>
+          <h3>Resultado por evento</h3>
           <p className="muted">
-            O resultado de cada evento no período — quais deram lucro e quais não —, com o saldo
-            consolidado de todos.
+            O resultado de cada evento no período — quais deram lucro e quais não. Soma apenas o
+            que foi lançado com evento, então não é o saldo do caixa.
           </p>
           <p className="hint">
             De {formatDate(dateRange.from)} a {formatDate(dateRange.to)}
@@ -79,8 +79,8 @@ export default function ReportsPage() {
         <article className="card report-card">
           <h3>Fluxo de caixa</h3>
           <p className="muted">
-            O previsto: o que está vencido, o que cai neste mês e a projeção dos próximos, separando
-            a receber de a pagar.
+            O previsto visto pelos contratos: o que está vencido, o que cai neste mês e a projeção
+            dos próximos, separando a receber de a pagar.
           </p>
 
           <div className="field">

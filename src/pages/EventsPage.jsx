@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import AsyncBoundary from '../components/AsyncBoundary.jsx'
 import CashSummary from '../components/CashSummary.jsx'
 import EventFilters from '../components/EventFilters.jsx'
@@ -18,8 +19,8 @@ export default function EventsPage() {
 
   const { from, to, status } = filters
 
-  // O caixa acompanha o período filtrado, mas ignora a situação: fechar um
-  // evento consolida o resultado, não o tira do caixa.
+  // O consolidado acompanha o período filtrado, mas ignora a situação: fechar
+  // um evento congela o resultado, não o tira da conta.
   const load = useCallback(
     () => Promise.all([listEvents({ from, to, status }), getCashReport({ from, to })]),
     [from, to, status],
@@ -48,12 +49,17 @@ export default function EventsPage() {
       <div className="page-intro">
         <h2>Eventos</h2>
         <p className="muted">
-          Cada evento soma suas entradas e saídas; o caixa é a soma dos resultados.
+          O resultado de cada trabalho. Só entra aqui o que foi lançado com um evento —
+          o caixa completo, com os custos que não pertencem a evento nenhum, está em{' '}
+          <Link className="link" to="/">
+            Caixa
+          </Link>
+          .
         </p>
 
         <div className="export-bar">
           <ExportButtons
-            label="Caixa por evento:"
+            label="Resultado por evento:"
             onExport={(format) => downloadCashReport(format, { from, to })}
           />
         </div>

@@ -1322,3 +1322,55 @@ textarea {
     flex: 1;
   }
 }
+
+/* --- Realizado x previsto ------------------------------------------------- */
+
+/* A projeção não pode ter o mesmo peso visual do que aconteceu: é estimativa,
+   e confundir as duas é o jeito mais fácil de gastar dinheiro que não entrou. */
+.amount.forecast {
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.row-forecast td {
+  background: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 7px,
+    rgba(37, 99, 235, 0.035) 7px,
+    rgba(37, 99, 235, 0.035) 14px
+  );
+}
+
+/* A linha onde o registrado acaba e a projeção começa. */
+.row-horizon td {
+  border-top: 2px solid var(--primary);
+}
+
+.nav-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 6px 4px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  /* Empilhada em cards, a listra do fundo vira ruído e o traço do horizonte
+     não separa mais nada — o rótulo "previsto" já diz o que é. */
+  .row-forecast td {
+    background: none;
+  }
+
+  .row-horizon td {
+    border-top: none;
+  }
+
+  .row-horizon td:first-child {
+    border-top: 2px solid var(--primary);
+  }
+
+  .nav-divider {
+    display: none;
+  }
+}
