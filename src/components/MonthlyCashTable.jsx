@@ -7,8 +7,13 @@ import { formatCurrency } from '../utils/format.js'
  * o mês corrente elas contam o que de fato se moveu; do mês corrente em diante,
  * o que está previsto. A coluna de saldo projetado só começa onde a previsão
  * começa — antes dela seria uma cópia do saldo realizado.
+ *
+ * Meses anteriores ao saldo inicial saem em branco de propósito: o que
+ * aconteceu antes dele já está dentro dele. Mostrar "R$ 0,00" ali seria afirmar
+ * que o caixa estava zerado, e a pessoa que digitou aqueles meses acharia que
+ * perdeu os dados.
  */
-export default function MonthlyCashTable({ months, bestIndex, worstIndex }) {
+export default function MonthlyCashTable({ months, bestIndex, worstIndex, openingOn }) {
   if (months.length === 0) {
     return (
       <div className="card empty">
@@ -20,6 +25,10 @@ export default function MonthlyCashTable({ months, bestIndex, worstIndex }) {
   const firstForecast = months.findIndex(
     (month) => month.expectedIncome > 0 || month.expectedExpense > 0 || month.isForecast,
   )
+
+  // A competência do saldo inicial: tudo antes dela é anterior ao começo da
+  // história registrada.
+  const openingCompetence = openingOn ? openingOn.slice(0, 7) : null
 
   return (
     <div className="card table-wrapper">
@@ -40,17 +49,19 @@ export default function MonthlyCashTable({ months, bestIndex, worstIndex }) {
           {months.map((month, index) => {
             const expects = month.expectedIncome > 0 || month.expectedExpense > 0
             const projects = firstForecast >= 0 && index >= firstForecast
+            const beforeOpening = openingCompetence !== null && month.competence < openingCompetence
 
             return (
               <tr
                 key={month.competence}
-                className={rowClass(month, index === firstForecast)}
+                className={rowClass(month, index === firstForecast, beforeOpening)}
               >
                 <td data-label="Mês">
                   <Link className="link" to={`/lancamentos?competencia=${month.competence}`}>
                     {competenceLabel(month.competence)}
                   </Link>
                   {month.isForecast && <span className="tag">previsto</span>}
+                  {beforeOpening && <span className="tag">antes do saldo inicial</span>}
                   {index === bestIndex && <span className="tag good">melhor</span>}
                   {index === worstIndex && <span className="tag bad">pior</span>}
                 </td>
@@ -71,7 +82,7 @@ export default function MonthlyCashTable({ months, bestIndex, worstIndex }) {
                   data-label="Saldo"
                   className={`right amount strong ${month.closingBalance < 0 ? 'expense' : ''}`}
                 >
-                  {formatCurrency(month.closingBalance)}
+                  {beforeOpening ? <Dash /> : formatCurrency(month.closingBalance)}
                 </td>
 
                 <td data-label="A entrar" className="right amount forecast income">
@@ -100,11 +111,12 @@ function Dash() {
   return <span className="muted">—</span>
 }
 
-function rowClass(month, startsForecast) {
+function rowClass(month, startsForecast, beforeOpening) {
   const classes = []
 
   // Mês sem movimento continua na série, mas não disputa a atenção.
   if (month.entryCount === 0 && !month.isForecast) classes.push('row-quiet')
+  if (beforeOpening) classes.push('row-quiet')
   if (month.isForecast) classes.push('row-forecast')
 
   // Uma linha marca onde o registrado acaba e a projeção começa.

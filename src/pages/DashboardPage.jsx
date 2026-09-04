@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AsyncBoundary from '../components/AsyncBoundary.jsx'
+import CashOpeningCard from '../components/CashOpeningCard.jsx'
 import CategoryBreakdown from '../components/CategoryBreakdown.jsx'
 import ExportButtons from '../components/ExportButtons.jsx'
 import MetricCards from '../components/MetricCards.jsx'
@@ -83,6 +84,8 @@ export default function DashboardPage() {
               ]}
             />
 
+            <CashOpeningCard opening={data.opening} onChange={reload} />
+
             {(data.overdueReceivable > 0 || data.overduePayable > 0) && (
               <div className="card status-card" role="status">
                 <p>
@@ -113,6 +116,7 @@ export default function DashboardPage() {
               months={data.months}
               bestIndex={data.bestMonthIndex}
               worstIndex={data.worstMonthIndex}
+              openingOn={data.opening?.occurredOn}
             />
 
             {focused && (
