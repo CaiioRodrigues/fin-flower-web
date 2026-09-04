@@ -19,17 +19,21 @@ export default function Logo({ size = 32, title = 'Fin Flower', animated = true,
     >
       <title>{title}</title>
 
-      {/* Caule primeiro, para as pétalas cobrirem onde ele encosta na flor. */}
+      {/*
+        Caule primeiro, para as pétalas cobrirem onde ele encosta na flor. As
+        folhas nascem abaixo da linha das pétalas: mais acima, a da esquerda
+        sumia sob elas e a flor saía com uma folha só.
+      */}
       <path className="logo-stem" d="M24 20 L24 43" stroke="var(--income)" strokeWidth="2.8" strokeLinecap="round" />
       <path
         className="logo-leaf logo-leaf-right"
-        d="M24 34 C29.5 31.5, 34 34, 34 34 C31.5 38.5, 26 38.5, 24 34 Z"
+        d="M24 33.5 C29.5 31, 34 33.5, 34 33.5 C31.5 38, 26 38, 24 33.5 Z"
         fill="var(--income)"
         opacity="0.75"
       />
       <path
         className="logo-leaf logo-leaf-left"
-        d="M24 28 C18.5 25.5, 14 28, 14 28 C16.5 32.5, 22 32.5, 24 28 Z"
+        d="M24 38.5 C18.5 36, 14 38.5, 14 38.5 C16.5 43, 22 43, 24 38.5 Z"
         fill="var(--income)"
       />
 

@@ -53,3 +53,16 @@ export function reopenQuote(quoteId) {
 export function approveQuote(quoteId, approval) {
   return api.post(`/api/quotes/${quoteId}/approve`, approval)
 }
+
+/**
+ * A proposta em PDF — o arquivo que vai anexado ao cliente. O nome sai do
+ * número do orçamento porque é assim que ele volta na resposta do e-mail.
+ */
+export function downloadProposal(quoteId, number) {
+  const stem = String(number ?? 'orcamento')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
+  return api.saveAs(`/api/quotes/${quoteId}/proposal`, `proposta-${stem}.pdf`)
+}

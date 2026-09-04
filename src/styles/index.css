@@ -407,8 +407,14 @@ input[aria-invalid='true'] {
   color: var(--expense);
 }
 
+/*
+ * Envolve em vez de esmagar. Sem o wrap, um filho largo — o seletor de mês —
+ * era comprimido até quebrar por dentro, e a seta anterior, o campo e a seta
+ * seguinte apareciam em três linhas separadas.
+ */
 .filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: flex-end;
 }
@@ -1135,11 +1141,17 @@ textarea {
 
 /* --- Seleção de competência ----------------------------------------------- */
 
+/*
+ * Uma linha só, sempre: setas e campo formam um controle único, e separá-los em
+ * linhas diferentes desmancha o gesto de "mês anterior / próximo mês". Quando
+ * falta espaço, o campo encolhe — quem cede é ele, não o conjunto.
+ */
 .month-picker {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .month-picker-center {
@@ -1163,6 +1175,7 @@ textarea {
 .month-input {
   min-width: 0;
   max-width: 170px;
+  flex: 0 1 auto;
 }
 
 .btn.icon {
@@ -1633,13 +1646,29 @@ textarea {
   50% { transform: rotate(6deg); }
 }
 
-/* --- Botão de tema -------------------------------------------------------- */
+/* --- Botões de tema e de tutorial ----------------------------------------- */
 
-.theme-toggle {
+.theme-toggle,
+.tutorial-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin-left: 0;
+}
+
+.tutorial-button-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+/* Num celular a barra tem quatro controles: sem os rótulos, os ícones e o
+   nome de quem entrou cabem numa linha só. */
+@media (max-width: 560px) {
+  .theme-label,
+  .tutorial-button-label {
+    display: none;
+  }
 }
 
 .theme-icon {
@@ -1872,7 +1901,7 @@ textarea {
   margin-left: 0;
 }
 
-/* --- Marca clicável e rodapé ---------------------------------------------- */
+/* --- Marca clicável ------------------------------------------------------- */
 
 .brand {
   border: none;
@@ -1884,10 +1913,3 @@ textarea {
   cursor: pointer;
 }
 
-.app-footer {
-  margin-top: 28px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: center;
-}
