@@ -1303,6 +1303,17 @@ textarea {
   text-decoration: underline;
 }
 
+/* Um botão que se lê como link: a ação abre um formulário na própria tela, e
+   pintá-la de botão daria a ela mais peso que o aviso onde ela mora. */
+.link.as-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .pager {
   display: flex;
   align-items: center;
