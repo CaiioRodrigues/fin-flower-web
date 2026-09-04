@@ -2,6 +2,13 @@ import { Link } from 'react-router-dom'
 import StatusBadge from './StatusBadge.jsx'
 import { formatCurrency, formatDate } from '../utils/format.js'
 
+function resultClass(event) {
+  if (event.entryCount === 0) return undefined
+  if (event.result > 0) return 'row-positive'
+  if (event.result < 0) return 'row-negative'
+  return undefined
+}
+
 export default function EventList({ events }) {
   if (events.length === 0) {
     return (
@@ -27,7 +34,9 @@ export default function EventList({ events }) {
         </thead>
         <tbody>
           {events.map((event) => (
-            <tr key={event.id}>
+            // O fundo diz se o trabalho deu lucro antes de a pessoa ler o valor.
+            // Evento sem lançamento fica sem tom: zero não é lucro nem prejuízo.
+            <tr key={event.id} className={resultClass(event)}>
               <td data-label="Evento">
                 <Link to={`/eventos/${event.id}`} className="link-strong">
                   {event.name}
