@@ -16,7 +16,7 @@ const STEPS = [
     title: 'Oi! Sou a Fin.',
     body:
       'Em um minuto eu mostro onde fica cada coisa. Você pode sair a qualquer momento e voltar '
-      + 'depois pelo botão de ajuda, no rodapé.',
+      + 'depois pelo botão Tutorial, ali em cima, ao lado do tema.',
   },
   {
     to: '/',

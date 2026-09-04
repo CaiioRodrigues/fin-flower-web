@@ -11,6 +11,7 @@ import {
   applyDiscount,
   approveQuote,
   deleteQuote,
+  downloadProposal,
   getQuote,
   rejectQuote,
   removeQuoteItem,
@@ -34,6 +35,7 @@ export default function QuoteDetailPage() {
   const [editingDetails, setEditingDetails] = useState(false)
   const [discount, setDiscount] = useState('')
   const [busy, setBusy] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [actionError, setActionError] = useState(null)
 
   async function run(action) {
@@ -63,6 +65,23 @@ export default function QuoteDetailPage() {
     } catch (caught) {
       setActionError(caught)
       setBusy(false)
+    }
+  }
+
+  /**
+   * Baixar não muda nada no orçamento, então fica fora do `run`: recarregar a
+   * tela depois de salvar um arquivo só faria o conteúdo piscar à toa.
+   */
+  async function handleProposal() {
+    setDownloading(true)
+    setActionError(null)
+
+    try {
+      await downloadProposal(quoteId, quote.number)
+    } catch (caught) {
+      setActionError(caught)
+    } finally {
+      setDownloading(false)
     }
   }
 
@@ -105,6 +124,15 @@ export default function QuoteDetailPage() {
               </div>
 
               <div className="header-actions">
+                <button
+                  type="button"
+                  className="btn primary"
+                  onClick={handleProposal}
+                  disabled={downloading}
+                  title="Gera o PDF da proposta para enviar ao cliente"
+                >
+                  {downloading ? 'Gerando…' : 'Baixar proposta (PDF)'}
+                </button>
                 {quote.status === 'Draft' && (
                   <button
                     type="button"
@@ -128,7 +156,7 @@ export default function QuoteDetailPage() {
                 {quote.status === 'Rejected' && (
                   <button
                     type="button"
-                    className="btn primary"
+                    className="btn"
                     onClick={() => run(() => reopenQuote(quoteId))}
                     disabled={busy}
                   >

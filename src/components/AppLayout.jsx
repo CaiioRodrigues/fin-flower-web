@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 import Tour from './Tour.jsx'
+import TourButton from './TourButton.jsx'
 import { hasSeenTour } from './tourStorage.js'
 import { useAuth } from '../auth/authContext.js'
 
@@ -68,6 +69,7 @@ export default function AppLayout() {
         </button>
 
         <div className="topbar-user">
+          <TourButton onClick={() => setTourOpen(true)} />
           <ThemeToggle />
           <span className="muted">{user?.name}</span>
           <button type="button" className="btn small" onClick={handleSignOut} disabled={signingOut}>
@@ -95,12 +97,6 @@ export default function AppLayout() {
       </nav>
 
       <Outlet />
-
-      <footer className="app-footer">
-        <button type="button" className="btn small ghost" onClick={() => setTourOpen(true)}>
-          Rever o tutorial
-        </button>
-      </footer>
 
       {tourOpen && <Tour onClose={() => setTourOpen(false)} />}
     </div>
