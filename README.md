@@ -81,7 +81,22 @@ pelo que está previsto, com uma linha marcando onde um acaba e o outro começa.
 - Rotas protegidas — quem não tem sessão vai para o login e volta para a página pretendida
 - Logout revoga o refresh token no servidor
 
-Layout responsivo em todas as telas: as tabelas viram cards no celular.
+**Aparência e primeiros passos**
+
+- **Tema claro e escuro**, com um terceiro estado — seguir o sistema — que é o
+  inicial. Sem ele, o primeiro toque no botão descartaria a preferência do
+  sistema para sempre. Alt+clique volta ao automático
+- A flor da marca respira devagar e floresce ao passar o mouse; quem configurou
+  `prefers-reduced-motion` recebe tudo parado
+- **Linhas tingidas pelo resultado**: verde bem claro no positivo, vermelho bem
+  claro no negativo. O tom é sutil de propósito, porque são doze linhas seguidas
+  e um vermelho forte viraria semáforo em vez de leitura
+- **Tutorial guiado** pela Fin, a mesma flor da marca, que abre na primeira
+  visita e aponta para os elementos reais da tela. Volta pelo rodapé ou clicando
+  na marca
+
+Layout responsivo em todas as telas: as tabelas viram cards no celular, e a
+barra de navegação rola em vez de quebrar.
 
 ## Como rodar
 
@@ -128,6 +143,21 @@ VITE_API_URL=http://localhost:5212 docker compose up -d --build
 Esse endereço é o que o **navegador** usa, então é a porta publicada no host — não
 o nome do serviço na rede do compose. A API precisa liberar `http://localhost:5173`
 no CORS; o compose dela já faz isso.
+
+## Tema claro e escuro
+
+Toda cor da interface é uma variável CSS — não sobrou nenhum valor fixo fora do
+bloco de tokens. O tema escuro só redefine as variáveis, então uma tela nova
+nasce funcionando nos dois sem tocar em nada.
+
+A decisão vem de dois lugares, porque são duas perguntas diferentes: *o sistema
+está no escuro?* (`@media (prefers-color-scheme: dark)`) e *o usuário escolheu?*
+(`[data-theme]` na raiz). A guarda `:not([data-theme="light"])` faz a escolha
+explícita por claro vencer o sistema, e não o contrário.
+
+Verde e vermelho **clareiam** no tema escuro. Os tons do tema claro somem no
+fundo escuro e deixariam de cumprir o papel de dizer entrada e saída num
+relance — que é a razão de existirem.
 
 ## Identidade visual
 
@@ -180,7 +210,10 @@ src/
 │   ├── InstallmentsPage.jsx   # a lista de cobrança: vencidas e a vencer
 │   ├── LoginPage.jsx
 │   └── RegisterPage.jsx
-├── components/                # MonthPicker, MonthlyCashTable, LedgerForm, ...
+├── components/                # MonthPicker, MonthlyCashTable, LedgerForm, Tour, ...
+├── theme/
+│   ├── ThemeProvider.jsx      # claro / escuro / seguir o sistema
+│   └── themeContext.js        # contexto e hook useTheme
 ├── hooks/useAsync.js          # carregamento, erro e recarga
 ├── styles/index.css
 └── utils/

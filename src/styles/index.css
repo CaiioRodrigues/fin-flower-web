@@ -5,31 +5,176 @@
   --primary: #2563eb;
   --primary-dark: #1d4ed8;
   --primary-soft: #eff4ff;
+  --primary-ring: rgba(37, 99, 235, 0.28);
 
   --bg: #f6f8fb;
   --surface: #ffffff;
+
+  /* Preenchimento sutil: hover de botão, fundo de barra, cabeçalho de tabela. */
+  --surface-2: #f2f4f7;
+  --surface-3: #eceff2;
+
   --border: #e3e8ef;
   --text: #101828;
   --muted: #667085;
+
+  /* Texto sobre botão colorido. No escuro continua claro: o botão é que muda. */
+  --on-accent: #ffffff;
 
   /* Semântica do dinheiro */
   --income: #15803d;
   --expense: #c1121f;
 
+  /* Duas intensidades: 'soft' para etiqueta e distintivo, 'tint' para o fundo
+     da linha inteira — que precisa ser quase imperceptível para tingir doze
+     linhas seguidas sem virar semáforo. */
+  --income-soft: rgba(21, 128, 61, 0.12);
+  --income-tint: rgba(21, 128, 61, 0.055);
+  --expense-soft: rgba(193, 18, 31, 0.1);
+  --expense-tint: rgba(193, 18, 31, 0.05);
+
   /* Ações destrutivas: o vermelho mais forte da interface */
   --danger: #d92d20;
   --danger-dark: #b42318;
   --danger-soft: #fef3f2;
+  --danger-ring: rgba(217, 45, 32, 0.3);
 
   /* Formatos de arquivo, nas cores que as pessoas já reconhecem */
   --excel: #107c41;
   --excel-soft: #e9f5ee;
+  --excel-hover: #d8ecdf;
+  --excel-ring: rgba(16, 124, 65, 0.35);
   --pdf: #c1121f;
   --pdf-soft: #fdeeee;
+  --pdf-hover: #fadedf;
+  --pdf-ring: rgba(193, 18, 31, 0.3);
+
+  --disabled-bg: #f1f1f1;
+  --disabled-text: #9aa5a0;
+
+  /* Listra dos meses previstos */
+  --forecast-stripe: rgba(37, 99, 235, 0.035);
 
   --radius: 10px;
   --shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+
+  /* Uma duração só para tudo que se move: a interface responde no mesmo ritmo. */
+  --motion: 180ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
   color-scheme: light;
+}
+
+/*
+ * Tema escuro em dois lugares porque são duas perguntas diferentes: o sistema
+ * está no escuro? e o usuário escolheu escuro? A guarda :not([data-theme="light"])
+ * faz a escolha explícita por claro vencer o sistema, e não o contrário.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --primary: #60a5fa;
+    --primary-dark: #93c5fd;
+    --primary-soft: rgba(96, 165, 250, 0.14);
+    --primary-ring: rgba(96, 165, 250, 0.4);
+
+    --bg: #0e131d;
+    --surface: #161d2b;
+    --surface-2: #1e2736;
+    --surface-3: #26303f;
+
+    --border: #2b3648;
+    --text: #e7edf7;
+    --muted: #94a3b8;
+
+    /* Verde e vermelho clareiam no escuro: os tons do tema claro somem no fundo
+       e deixariam de cumprir o papel de dizer entrada e saída num relance. */
+    --income: #4ade80;
+    --expense: #f87171;
+    --income-soft: rgba(74, 222, 128, 0.16);
+    --income-tint: rgba(74, 222, 128, 0.07);
+    --expense-soft: rgba(248, 113, 113, 0.16);
+    --expense-tint: rgba(248, 113, 113, 0.07);
+
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --danger-soft: rgba(248, 113, 113, 0.14);
+    --danger-ring: rgba(248, 113, 113, 0.35);
+
+    --excel: #4ade80;
+    --excel-soft: rgba(74, 222, 128, 0.14);
+    --excel-hover: rgba(74, 222, 128, 0.22);
+    --excel-ring: rgba(74, 222, 128, 0.35);
+    --pdf: #f87171;
+    --pdf-soft: rgba(248, 113, 113, 0.14);
+    --pdf-hover: rgba(248, 113, 113, 0.22);
+    --pdf-ring: rgba(248, 113, 113, 0.35);
+
+    --disabled-bg: #232c3a;
+    --disabled-text: #64748b;
+
+    --forecast-stripe: rgba(96, 165, 250, 0.06);
+
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --primary: #60a5fa;
+  --primary-dark: #93c5fd;
+  --primary-soft: rgba(96, 165, 250, 0.14);
+  --primary-ring: rgba(96, 165, 250, 0.4);
+
+  --bg: #0e131d;
+  --surface: #161d2b;
+  --surface-2: #1e2736;
+  --surface-3: #26303f;
+
+  --border: #2b3648;
+  --text: #e7edf7;
+  --muted: #94a3b8;
+
+  --income: #4ade80;
+  --expense: #f87171;
+  --income-soft: rgba(74, 222, 128, 0.16);
+  --income-tint: rgba(74, 222, 128, 0.07);
+  --expense-soft: rgba(248, 113, 113, 0.16);
+  --expense-tint: rgba(248, 113, 113, 0.07);
+
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+  --danger-ring: rgba(248, 113, 113, 0.35);
+
+  --excel: #4ade80;
+  --excel-soft: rgba(74, 222, 128, 0.14);
+  --excel-hover: rgba(74, 222, 128, 0.22);
+  --excel-ring: rgba(74, 222, 128, 0.35);
+  --pdf: #f87171;
+  --pdf-soft: rgba(248, 113, 113, 0.14);
+  --pdf-hover: rgba(248, 113, 113, 0.22);
+  --pdf-ring: rgba(248, 113, 113, 0.35);
+
+  --disabled-bg: #232c3a;
+  --disabled-text: #64748b;
+
+  --forecast-stripe: rgba(96, 165, 250, 0.06);
+
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}
+
+/* Quem pediu menos movimento recebe menos movimento — vale para a marca, para
+   o tutorial e para qualquer transição declarada abaixo. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 * {
@@ -125,13 +270,13 @@ select {
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
-  background: #fff;
+  background: var(--surface);
   color: inherit;
 }
 
 input:focus,
 select:focus {
-  outline: 2px solid rgba(37, 99, 235, 0.28);
+  outline: 2px solid var(--primary-ring);
   outline-offset: 1px;
   border-color: var(--primary);
 }
@@ -162,7 +307,7 @@ input[aria-invalid='true'] {
 
 .btn {
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 9px 14px;
   border-radius: 8px;
@@ -172,13 +317,13 @@ input[aria-invalid='true'] {
 }
 
 .btn:hover {
-  background: #f2f5f3;
+  background: var(--surface-2);
 }
 
 .btn.primary {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .btn.primary:hover {
@@ -199,7 +344,7 @@ input[aria-invalid='true'] {
 .btn.danger {
   background: var(--danger);
   border-color: var(--danger);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .btn.danger:hover {
@@ -211,22 +356,22 @@ input[aria-invalid='true'] {
    não preenchidos, para não competirem com Excluir. */
 .btn.excel {
   color: var(--excel);
-  border-color: rgba(16, 124, 65, 0.35);
+  border-color: var(--excel-ring);
   background: var(--excel-soft);
 }
 
 .btn.excel:hover {
-  background: #d8ecdf;
+  background: var(--excel-hover);
 }
 
 .btn.pdf {
   color: var(--pdf);
-  border-color: rgba(193, 18, 31, 0.3);
+  border-color: var(--pdf-ring);
   background: var(--pdf-soft);
 }
 
 .btn.pdf:hover {
-  background: #fadedf;
+  background: var(--pdf-hover);
 }
 
 .summary {
@@ -272,9 +417,46 @@ input[aria-invalid='true'] {
   margin-bottom: 0;
 }
 
+/*
+ * A tabela larga rola, mas rolagem sem aviso parece defeito: o número aparece
+ * cortado e nada diz que há mais à direita. As duas primeiras camadas são
+ * "tampas" na cor do cartão que acompanham o conteúdo; as duas de baixo são
+ * sombras presas à moldura. Quando não há o que rolar, a tampa cobre a sombra
+ * e o efeito some sozinho — sem JavaScript medindo largura.
+ */
 .table-wrapper {
   padding: 0;
   overflow-x: auto;
+  background:
+    linear-gradient(to right, var(--surface) 40%, transparent) left center / 32px 100% no-repeat local,
+    linear-gradient(to left, var(--surface) 40%, transparent) right center / 32px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgb(16 24 40 / 16%), transparent) left center / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgb(16 24 40 / 16%), transparent) right center / 12px 100% no-repeat scroll;
+  background-color: var(--surface);
+}
+
+:root[data-theme='dark'] .table-wrapper {
+  background-image:
+    linear-gradient(to right, var(--surface) 40%, transparent),
+    linear-gradient(to left, var(--surface) 40%, transparent),
+    radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / 45%), transparent),
+    radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 45%), transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .table-wrapper {
+    background-image:
+      linear-gradient(to right, var(--surface) 40%, transparent),
+      linear-gradient(to left, var(--surface) 40%, transparent),
+      radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / 45%), transparent),
+      radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 45%), transparent);
+  }
+}
+
+/* As células precisam de fundo próprio, senão o degradê aparece por trás
+   delas em vez de ficar só nas bordas. */
+.table-wrapper .table thead th {
+  background-color: var(--surface);
 }
 
 .table {
@@ -313,7 +495,7 @@ input[aria-invalid='true'] {
 }
 
 .tag {
-  background: #f2f4f7;
+  background: var(--surface-2);
   border-radius: 999px;
   padding: 2px 9px;
   font-size: 12px;
@@ -444,7 +626,7 @@ input[aria-invalid='true'] {
 
 .alert {
   background: var(--danger-soft);
-  border: 1px solid rgba(217, 45, 32, 0.3);
+  border: 1px solid var(--danger-ring);
   color: var(--danger-dark);
   border-radius: 8px;
   padding: 10px 12px;
@@ -555,12 +737,12 @@ input[aria-invalid='true'] {
 }
 
 .badge-open {
-  background: rgba(21, 128, 61, 0.12);
+  background: var(--income-soft);
   color: var(--income);
 }
 
 .badge-closed {
-  background: #eceff0;
+  background: var(--surface-3);
   color: var(--muted);
 }
 
@@ -635,19 +817,6 @@ input[aria-invalid='true'] {
     gap: 0;
   }
 
-  .nav {
-    overflow-x: auto;
-    /* Sem isto os itens encolhem em vez de rolar. */
-    scrollbar-width: none;
-  }
-
-  .nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav-link {
-    white-space: nowrap;
-  }
 
   /* Ações viram largura cheia: alvo de toque confortável e sem quebra estranha. */
   .table td .btn.small,
@@ -667,14 +836,27 @@ input[aria-invalid='true'] {
 
 /* --- Navegação ------------------------------------------------------------ */
 
+/*
+ * O menu rola em vez de quebrar, em qualquer largura. Antes o nowrap só valia
+ * abaixo de 560px, então entre 560 e 860 "Gastos fixos" partia em duas linhas
+ * e a barra ficava com o dobro da altura.
+ */
 .nav {
   display: flex;
   gap: 4px;
   border-bottom: 1px solid var(--border);
   margin-top: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-link {
+  white-space: nowrap;
+  flex-shrink: 0;
   padding: 8px 14px;
   font-size: 14px;
   font-weight: 600;
@@ -718,33 +900,33 @@ input[aria-invalid='true'] {
 }
 
 .badge-receivable {
-  background: rgba(21, 128, 61, 0.12);
+  background: var(--income-soft);
   color: var(--income);
 }
 
 .badge-payable {
-  background: rgba(193, 18, 31, 0.1);
+  background: var(--expense-soft);
   color: var(--expense);
 }
 
 .badge-pending {
-  background: #eef1f3;
+  background: var(--surface-3);
   color: var(--muted);
 }
 
 .badge-settled {
-  background: rgba(21, 128, 61, 0.12);
+  background: var(--income-soft);
   color: var(--income);
 }
 
 .badge-canceled {
-  background: #f1f1f1;
-  color: #9aa5a0;
+  background: var(--disabled-bg);
+  color: var(--disabled-text);
   text-decoration: line-through;
 }
 
 .row-overdue td {
-  background: rgba(193, 18, 31, 0.05);
+  background: var(--expense-tint);
 }
 
 .settle-row td {
@@ -830,14 +1012,14 @@ input[aria-invalid='true'] {
   gap: 6px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   padding-left: 10px;
   /* min-width: 0 impede o campo de empurrar a grade além da largura da coluna. */
   min-width: 0;
 }
 
 .money-field:focus-within {
-  outline: 2px solid rgba(37, 99, 235, 0.28);
+  outline: 2px solid var(--primary-ring);
   outline-offset: 1px;
   border-color: var(--primary);
 }
@@ -1080,7 +1262,7 @@ textarea {
 }
 
 .tag.good {
-  background: #e9f5ee;
+  background: var(--income-soft);
   color: var(--income);
 }
 
@@ -1198,7 +1380,7 @@ textarea {
 }
 
 .segment.active.income {
-  background: #e9f5ee;
+  background: var(--income-soft);
   color: var(--income);
 }
 
@@ -1272,7 +1454,7 @@ textarea {
 
 .badge.approved,
 .badge.settled {
-  background: #e9f5ee;
+  background: var(--income-soft);
   color: var(--income);
 }
 
@@ -1337,8 +1519,8 @@ textarea {
     135deg,
     transparent,
     transparent 7px,
-    rgba(37, 99, 235, 0.035) 7px,
-    rgba(37, 99, 235, 0.035) 14px
+    var(--forecast-stripe) 7px,
+    var(--forecast-stripe) 14px
   );
 }
 
@@ -1373,4 +1555,339 @@ textarea {
   .nav-divider {
     display: none;
   }
+}
+
+/* --- A flor: identidade em movimento -------------------------------------- */
+
+.logo-head,
+.logo-petals,
+.logo-coin,
+.logo-leaf {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* A folha gira presa ao caule, não em torno do próprio meio — senão ela se
+   solta e fica boiando ao lado da flor. */
+.logo-leaf-left {
+  transform-origin: right center;
+}
+
+.logo-leaf-right {
+  transform-origin: left center;
+}
+
+/* Respiração lenta e de baixa amplitude. Um logo que pulsa forte cansa em
+   segundos; este só evita que a tela pareça congelada. */
+.logo-animated .logo-head {
+  animation: flor-respira 5.5s var(--ease) infinite;
+}
+
+.logo-animated .logo-leaf-left {
+  animation: folha-balanca 4.5s var(--ease) infinite;
+}
+
+.logo-animated .logo-leaf-right {
+  animation: folha-balanca 4.5s var(--ease) infinite -2.2s;
+}
+
+@keyframes flor-respira {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.045) rotate(2.5deg); }
+}
+
+@keyframes folha-balanca {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-5deg); }
+}
+
+/* O florescer: pétalas abrem e a moeda gira. Só onde a marca é clicável. */
+.brand .logo-petals,
+.brand .logo-coin {
+  transition: transform 420ms var(--ease);
+}
+
+.brand:hover .logo-petals,
+.brand:focus-visible .logo-petals {
+  transform: scale(1.12) rotate(36deg);
+}
+
+.brand:hover .logo-coin,
+.brand:focus-visible .logo-coin {
+  transform: rotateY(180deg);
+}
+
+/* Humores do mascote, usados pelo tutorial. */
+.logo-happy .logo-head { animation: flor-comemora 900ms var(--ease); }
+.logo-thinking .logo-head { animation: flor-pensa 2.4s var(--ease) infinite; }
+
+@keyframes flor-comemora {
+  0% { transform: scale(1) rotate(0deg); }
+  35% { transform: scale(1.22) rotate(-10deg); }
+  70% { transform: scale(1.08) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes flor-pensa {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+/* --- Botão de tema -------------------------------------------------------- */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 0;
+}
+
+.theme-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+.theme-icon svg {
+  overflow: visible;
+}
+
+.theme-sun,
+.theme-moon {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 320ms var(--ease), opacity 320ms var(--ease);
+}
+
+/* Um encolhe girando enquanto o outro cresce: a troca de tema tem um gesto,
+   não um piscar. */
+.theme-moon {
+  transform: scale(0.3) rotate(-90deg);
+  opacity: 0;
+}
+
+[data-theme='dark'] .theme-sun {
+  transform: scale(0.3) rotate(90deg);
+  opacity: 0;
+}
+
+[data-theme='dark'] .theme-moon {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-sun {
+    transform: scale(0.3) rotate(90deg);
+    opacity: 0;
+  }
+
+  :root:not([data-theme='light']) .theme-moon {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* --- Resultado colorido nas listas ---------------------------------------- */
+
+/*
+ * O fundo diz o sinal antes de a pessoa ler o número. É muito claro de
+ * propósito: são doze linhas seguidas, e um tom forte viraria semáforo em vez
+ * de leitura. O valor em si continua colorido — a cor do fundo reforça, não
+ * substitui.
+ */
+.row-positive td {
+  background-color: var(--income-tint);
+}
+
+.row-negative td {
+  background-color: var(--expense-tint);
+}
+
+/* A listra do previsto vem por cima do tom do resultado, não no lugar dele. */
+.row-forecast.row-positive td,
+.row-forecast.row-negative td {
+  background-blend-mode: multiply;
+}
+
+/* --- Movimento na interface ----------------------------------------------- */
+
+.btn,
+.nav-link,
+.card,
+.metric {
+  transition: background-color var(--motion) var(--ease),
+    border-color var(--motion) var(--ease), color var(--motion) var(--ease),
+    transform var(--motion) var(--ease), box-shadow var(--motion) var(--ease);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.metric:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+}
+
+.table tbody tr {
+  transition: background-color var(--motion) var(--ease);
+}
+
+.table tbody tr:hover td {
+  background-color: var(--surface-2);
+}
+
+/* A barra de composição cresce da esquerda quando a tela abre. */
+.breakdown-bar span {
+  animation: barra-cresce 620ms var(--ease) both;
+  transform-origin: left center;
+}
+
+@keyframes barra-cresce {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Conteúdo que chega depois do carregamento entra em vez de aparecer. */
+.stack > * {
+  animation: entra 260ms var(--ease) both;
+}
+
+@keyframes entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Tutorial guiado ------------------------------------------------------ */
+
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+.tour-veil {
+  position: absolute;
+  inset: 0;
+  background: rgb(8 12 20 / 55%);
+  animation: entra 220ms var(--ease) both;
+}
+
+/* O recorte é uma sombra gigante em vez de um buraco de verdade: assim o alvo
+   continua clicável e o resto continua escurecido, sem clip-path. */
+.tour-spot {
+  position: absolute;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgb(8 12 20 / 55%), 0 0 0 3px var(--primary);
+  pointer-events: none;
+  transition: top 260ms var(--ease), left 260ms var(--ease),
+    width 260ms var(--ease), height 260ms var(--ease);
+  animation: pisca-alvo 2.2s var(--ease) infinite;
+}
+
+@keyframes pisca-alvo {
+  0%, 100% { box-shadow: 0 0 0 9999px rgb(8 12 20 / 55%), 0 0 0 3px var(--primary); }
+  50% { box-shadow: 0 0 0 9999px rgb(8 12 20 / 55%), 0 0 0 6px var(--primary-soft); }
+}
+
+.tour-bubble {
+  position: absolute;
+  width: min(360px, calc(100vw - 24px));
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 24%);
+  animation: balao-entra 280ms var(--ease) both;
+}
+
+.tour-bubble-centre {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes balao-entra {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tour-bubble-centre {
+  animation-name: balao-entra-centro;
+}
+
+@keyframes balao-entra-centro {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.97); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.tour-mascot {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.tour-body {
+  min-width: 0;
+}
+
+.tour-body h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.tour-body p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tour-count {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tour-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.tour-buttons .btn {
+  margin-left: 0;
+}
+
+/* --- Marca clicável e rodapé ---------------------------------------------- */
+
+.brand {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-footer {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
 }

@@ -35,7 +35,10 @@ export default function LedgerTable({ entries, onEdit, onDelete, busyId }) {
         </thead>
         <tbody>
           {entries.map((entry) => (
-            <tr key={entry.id}>
+            <tr
+              key={entry.id}
+              className={entry.type === 'Income' ? 'row-positive' : 'row-negative'}
+            >
               <td data-label="Data">{formatDate(entry.occurredOn)}</td>
 
               <td data-label="Descrição">

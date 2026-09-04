@@ -1,6 +1,9 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import Logo from './Logo.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
+import Tour from './Tour.jsx'
+import { hasSeenTour } from './tourStorage.js'
 import { useAuth } from '../auth/authContext.js'
 
 /**
@@ -27,6 +30,16 @@ const GROUPS = [
 export default function AppLayout() {
   const { user, signOut } = useAuth()
   const [signingOut, setSigningOut] = useState(false)
+  const [tourOpen, setTourOpen] = useState(false)
+
+  // Só na primeira visita, e depois de a tela existir: abrir o passeio sobre
+  // um layout que ainda não assentou põe o balão no lugar errado.
+  useEffect(() => {
+    if (hasSeenTour()) return undefined
+
+    const timer = window.setTimeout(() => setTourOpen(true), 700)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -41,15 +54,21 @@ export default function AppLayout() {
   return (
     <div className="app">
       <header className="header topbar">
-        <div className="brand">
+        <button
+          type="button"
+          className="brand"
+          onClick={() => setTourOpen(true)}
+          title="Rever o tutorial"
+        >
           <Logo size={38} />
           <div>
             <h1>Fin Flower</h1>
             <p className="muted">Controle financeiro do seu negócio</p>
           </div>
-        </div>
+        </button>
 
         <div className="topbar-user">
+          <ThemeToggle />
           <span className="muted">{user?.name}</span>
           <button type="button" className="btn small" onClick={handleSignOut} disabled={signingOut}>
             {signingOut ? 'Saindo…' : 'Sair'}
@@ -76,6 +95,14 @@ export default function AppLayout() {
       </nav>
 
       <Outlet />
+
+      <footer className="app-footer">
+        <button type="button" className="btn small ghost" onClick={() => setTourOpen(true)}>
+          Rever o tutorial
+        </button>
+      </footer>
+
+      {tourOpen && <Tour onClose={() => setTourOpen(false)} />}
     </div>
   )
 }

@@ -110,5 +110,14 @@ function rowClass(month, startsForecast) {
   // Uma linha marca onde o registrado acaba e a projeção começa.
   if (startsForecast) classes.push('row-horizon')
 
+  // O fundo diz o sinal antes de a pessoa ler o número. Um mês previsto é
+  // tingido pelo resultado projetado, que é o único que ele tem; um mês sem
+  // movimento não é tingido, porque zero não é lucro nem prejuízo.
+  const result = month.isForecast ? month.projectedResult : month.result
+  if (month.entryCount > 0 || month.isForecast) {
+    if (result > 0) classes.push('row-positive')
+    else if (result < 0) classes.push('row-negative')
+  }
+
   return classes.join(' ') || undefined
 }
